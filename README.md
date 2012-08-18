@@ -13,18 +13,6 @@ Simple interface to quickly query a collection by it's short name, returning a r
 $results = Epic_Mongo::db('shortname')->find(array());
 ```
 
-Easy Document Creation
----
-Easily create a new document that is properly typed into the proper objects. 
-
-```php
-$user = Epic_Mongo::new('shortname');
-$user->id = 1;
-$user->username = 'admin';
-$user->password = 'password';
-$user->save();
-```
-
 Create Document Types
 ---
 Create different document types with specific requirements, functionality and are extendable.
@@ -35,7 +23,25 @@ class User extends Epic_Mongo_Document {
 	// The collection the documents are saved into
 	protected static $_collectionName = 'users';
 }
+```
 
+Easy Document Creation
+---
+Easily create a new document that is properly typed into the proper objects. 
+
+```php
+// Create a new Document 
+$user = Epic_Mongo::new('user');
+$user->id = 1;
+$user->username = 'admin';
+$user->password = 'password';
+$user->save();
+```
+Automatic Reference Building
+---
+When you pass a Document into a field with a requirement of 'AsReference', it converts the Document to a DBRef
+
+```php
 // A 'post' that a user could create
 class Post extends Epic_Mongo_Document {
 	// The collection the documents are saved into
@@ -77,10 +83,13 @@ Automatically return the proper documents from DBRef references
 // This example uses the above example's classes and data
 $post = Epic_Mongo::db('post')->findOne(array('id' => 1));
 ?> 
-
+<!-- Renders the Post's Title -->
 <h1><?= $post->title ?></h1>
+<!-- Resolves the Reference for the Author, and Render's the User's Username -->
 <h4><?= $post->author->username ?></h4>
+<!-- Renders the Post's Body -->
 <div><?= $post->body ?></div>
+
 ```
 
 Returns Iteratable DocumentSets
@@ -89,16 +98,22 @@ When querying for more than one thing, automatically returns a DocumentSet
 
 ```phtml
 <?php
+// Get all posts sorted by the time field, descending
 $posts = Epic_Mongo::db('post')->find(array(), array('time' => -1))
 ?>
 <div>
+	<!-- Iterate over the Posts -->
 	<? foreach($posts as $post): ?>
 	<div>
+		<!-- Renders the Post's Title -->
 		<h1><?= $post->title ?></h1>
+		<!-- Resolves the Reference for the Author, and Render's the User's Username -->
 		<h4><?= $post->author->username ?></h4>
+		<!-- Renders the Post's Body -->
 		<div><?= $post->body ?></div>
 	</div>
 	<? endforeach; ?>
+</div>
 ```
 
 Automatic Reference Querying
@@ -106,8 +121,12 @@ Automatic Reference Querying
 When you pass in a full object, it will convert it to a reference per the requirements
 
 ```php
+// Select User #1
+$user = Epic_Mongo::db('user')->findOne(array('id' => 1));
+// Build a Query for the posts collection where the author is a reference of the user
 $query = array(
 	'author' => $user,
 );
+// Find all posts
 $posts = Epic_Mongo::db('post')->find($query);
 ```
