@@ -7,57 +7,85 @@ Features:
 
 Easy Querying
 ---
-Simple interface to quickly query a collection by it's short name, returning a result set that can be iterated over.
+Simple interface to quickly query a collection by it's short name, returning a Document or DocumentSet.
 
 ```php
-$results = Epic_Mongo::db('shortname')->find(array());
+$result = Epic_Mongo::db('shortname')->findOne();	// Returns Document
+$results = Epic_Mongo::db('shortname')->find();	// Returns DocumentSet
 ```
 
 Create Document Types
 ---
-Create different document types with specific requirements, functionality and are extendable.
+Create different document types with specific requirements, functionality and can be extended.
 
 ```php
 // A 'user' that someone would be logged in as
-class User extends Epic_Mongo_Document {
+class User_Class extends Epic_Mongo_Document {
 	// The collection the documents are saved into
 	protected static $_collectionName = 'users';
+}
+
+// A 'schema' is created for the connection to MongoDb
+class Schema_Class extends Epic_Mongo_Schema {
+	protected $_db = 'test_database';	// Defines which Database we use
+	protected static $_typeMap = array(
+		'user' => 'User_Class'	// This maps the 'shortname' of 'user' to the class 'User_Class'
+	);
 }
 ```
 
 Easy Document Creation
 ---
-Easily create a new document that is properly typed into the proper objects. 
+Easily create a new document that is properly typed. 
 
 ```php
-// Create a new Document 
-$user = Epic_Mongo::new('user');
+// Create a User 
+$user = Epic_Mongo::new('user');	// The 'shortname' from the schema
 $user->id = 1;
 $user->username = 'admin';
 $user->password = 'password';
 $user->save();
 ```
-Automatic Reference Building
+Document Field Requirements
 ---
-When you pass a Document into a field with a requirement of 'AsReference', it converts the Document to a DBRef
+Create Requirements for specific fields on the Document Type
+
+- 'Class:Name': (Optional) Forces the value of this field to be set to this Class when returned.
+- AsReference: (Optional) Converts any Document passed into this field into a reference.
+- Required: (Optional) Requires this field to be set in order to save.
 
 ```php
+// A 'user' that someone would be logged in as
+class User_Class extends Epic_Mongo_Document {
+	// The collection the documents are saved into
+	protected static $_collectionName = 'users';
+}
+
 // A 'post' that a user could create
-class Post extends Epic_Mongo_Document {
+class User_Post extends Epic_Mongo_Document {
 	// The collection the documents are saved into
 	protected static $_collectionName = 'posts';
 	// Any requirements on fields for this document
 	protected $_requirements = array(
-		// The key, 'author', indicates which field on this document these parameters are targeting.
-		// 'Class:Name' indicates that this field should returned as the type specified class.
-		// 'AsReference' as a parameter is optional, but automatically converts the document in this field to a reference.
-		// 'Required' as a parameter is optional, but automatically requires this field to be set in order to save.
 		'author' => array('Class:User', 'AsReference', 'Required'),	
 	);
 }
 
-// Grab User document with ID 1
-$user = Epic_Mongo::db('user')->findOne(array('id' => 1));
+// The schema must contain all of the different types
+class Schema_Class extends Epic_Mongo_Schema {
+	protected $_db = 'test_database';	// Defines which Database we use
+	protected static $_typeMap = array(
+		'user' => 'User_Class'	// This maps the 'shortname' of 'user' to the class 'User_Class'
+		'post' => 'User_Post'	// This maps the 'shortname' of 'post' to the class 'User_Post'
+	);
+}
+
+// Create a User 
+$user = Epic_Mongo::new('user');	// The 'shortname' from the schema
+$user->id = 2;
+$user->username = 'author';
+$user->password = 'password';
+$user->save();
 
 // Create a Post document for the User
 $post = Epic_Mongo::new('post');
@@ -108,7 +136,8 @@ $posts = Epic_Mongo::db('post')->find(array(), array('time' => -1))
 		<!-- Renders the Post's Title -->
 		<h1><?= $post->title ?></h1>
 		<!-- Resolves the Reference for the Author, and Render's the User's Username -->
-		<h4><?= $post->author->username ?></h4>
+		<!-- Iteration 1 = "admin", Iteration 2 = "author" -->
+		<h4><?= $post->author->username ?></h4> 
 		<!-- Renders the Post's Body -->
 		<div><?= $post->body ?></div>
 	</div>
