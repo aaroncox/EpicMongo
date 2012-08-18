@@ -19,6 +19,7 @@ Easily create a new document that is properly typed into the proper objects.
 
 ```php
 	$user = Epic_Mongo::new('shortname');
+	$user->id = 1;
 	$user->username = 'admin';
 	$user->password = 'password';
 	$user->save();
@@ -59,6 +60,7 @@ Create different document types with specific requirements, functionality and ar
 	$post->author = $user;
 	
 	// Set Extra 'post' information
+	$post->id = 1;
 	$post->title = 'Test Post';
 	$post->body = 'This is a test post, posted by User #1';
 	
@@ -69,7 +71,15 @@ Create different document types with specific requirements, functionality and ar
 Reference Resolution
 ---
 Automatically return the proper documents 
-```php
-	// This example uses the above example
+```phtml
+	<?php
+	// This example uses the above example's classes and data
+	$post = Epic_Mongo::db('post')->findOne(array('id' => 1));
+	?> 
+	
+	<h1><?= $post->title ?></h1>
+	<h4><?= $post->author->username ?></h4>
+	<div><?= $post->body ?></div>
+	
 	
 ```
