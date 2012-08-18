@@ -10,8 +10,10 @@ Easy Querying
 Simple interface to quickly query a collection by it's short name, returning a Document or DocumentSet.
 
 ```php
+<?php
 $result = Epic_Mongo::db('shortname')->findOne();	// Returns Document
 $results = Epic_Mongo::db('shortname')->find();	// Returns DocumentSet
+?>
 ```
 
 Create Document Types
@@ -19,6 +21,7 @@ Create Document Types
 Create different document types with specific requirements, functionality and can be extended.
 
 ```php
+<?php
 // A 'user' that someone would be logged in as
 class User_Class extends Epic_Mongo_Document {
 	// The collection the documents are saved into
@@ -32,6 +35,7 @@ class Schema_Class extends Epic_Mongo_Schema {
 		'user' => 'User_Class'	// This maps the 'shortname' of 'user' to the class 'User_Class'
 	);
 }
+?>
 ```
 
 Easy Document Creation
@@ -39,12 +43,15 @@ Easy Document Creation
 Easily create a new document that is properly typed. 
 
 ```php
+<?php
+
 // Create a User 
 $user = Epic_Mongo::new('user');	// The 'shortname' from the schema
 $user->id = 1;
 $user->username = 'admin';
 $user->password = 'password';
 $user->save();
+?>
 ```
 Document Field Requirements
 ---
@@ -55,6 +62,7 @@ Create Requirements for specific fields on the Document Type
 - Required: (Optional) Requires this field to be set in order to save.
 
 ```php
+<?php
 // A 'user' that someone would be logged in as
 class User_Class extends Epic_Mongo_Document {
 	// The collection the documents are saved into
@@ -101,6 +109,7 @@ $post->created = time();
 
 // Save the Post
 $post->save();
+?>
 ```
 
 Reference Resolution
@@ -150,6 +159,7 @@ Automatic Reference Querying
 When you pass in a full object, it will convert it to a reference per the requirements
 
 ```php
+<?php
 // Select User #1
 $user = Epic_Mongo::db('user')->findOne(array('id' => 1));
 // Build a Query for the posts collection where the author is a reference of the user
@@ -158,4 +168,5 @@ $query = array(
 );
 // Find all posts
 $posts = Epic_Mongo::db('post')->find($query);
+?>
 ```
