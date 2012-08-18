@@ -66,9 +66,9 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 	
 } // END class EpicMongoTest extends PHPUnit_Framework_TestCase
 
-class Test_Mongo_User {}
+class Test_Mongo_User extends Epic_Mongo_Document {}
 class Test2_Mongo_User extends Test_Mongo_User {}
-class Test_Mongo_Post {}
+class Test_Mongo_Post extends Epic_Mongo_Document {}
 
 class Test_Schema extends Epic_Mongo_Schema {
 	protected $_db = 'epic_mongo_test';
