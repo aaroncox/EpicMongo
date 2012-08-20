@@ -19,13 +19,13 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 	}
 		
 	public function testMap() {
-		$this->assertInstanceOf('Epic_Mongo_Map', Test_Schema::map());
+		$this->assertInstanceOf('Epic_Mongo_Map', Schema_Mongo_Schema::map());
 	}
 	
 	public function testSchemaInstance() {
-		$schema = new Test_Schema;
-		$schema2 = new Test2_Schema;
-		$schema3 = new Test3_Schema;
+		$schema = new Schema_Mongo_Schema;
+		$schema2 = new Schema_Mongo_Schema_Extend;
+		$schema3 = new Schema_Mongo_Schema_Extend_Extend;
 		$this->assertEquals('epic_mongo_test', $schema->getDb());
 		$this->assertEquals('epic_mongo_test2', $schema3->getDb());
 		// Make sure it's default (by default)
@@ -39,7 +39,7 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 	}
 	
 	public function testSchemaConnection() {
-		$schema = new Test_Schema;
+		$schema = new Schema_Mongo_Schema;
 		$connection = $schema->getMongoDb();
 		$this->assertInstanceOf('MongoDB', $connection);	
 		echo $connection."";	
@@ -49,46 +49,48 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 	 * @expectedException Epic_Mongo_Exception
 	 */
 	public function testRequiredDbException() {
-		$schema = new Test4_Schema;
+		$schema = new Schema_Mongo_Schema_NoExtend;
 		$schema->getDb();
 	}
 	
 	public function testMapArray() {
-		$this->assertEquals('Test_Mongo_User', Test_Schema::map()->getClass('user'));
-		$this->assertEquals('Test_Mongo_Post', Test_Schema::map()->getClass('post'));
+		$this->assertEquals('Schema_Mongo_User', Schema_Mongo_Schema::map()->getClass('user'));
+		$this->assertEquals('Schema_Mongo_Post', Schema_Mongo_Schema::map()->getClass('post'));
 	}
 
 	public function testMapArrayExtend() {
-		$this->assertEquals('Test2_Mongo_User', Test2_Schema::map()->getClass('user'));
-		$this->assertEquals('Test_Mongo_Post', Test2_Schema::map()->getClass('post'));
-		$this->assertEquals('Test2_Mongo_User', Test_Schema::map()->getClass('user'));
+		$this->assertEquals('Schema_Mongo_User_Extend', Schema_Mongo_Schema_Extend::map()->getClass('user'));
+		$this->assertEquals('Schema_Mongo_Post', Schema_Mongo_Schema_Extend::map()->getClass('post'));
+		$this->assertEquals('Schema_Mongo_User_Extend', Schema_Mongo_Schema::map()->getClass('user'));
 	}
 	
 } // END class EpicMongoTest extends PHPUnit_Framework_TestCase
 
-class Test_Mongo_User extends Epic_Mongo_Document {}
-class Test2_Mongo_User extends Test_Mongo_User {}
-class Test_Mongo_Post extends Epic_Mongo_Document {}
+class Schema_Mongo_Post extends Epic_Mongo_Document {}
+class Schema_Mongo_User extends Epic_Mongo_Document {}
+class Schema_Mongo_User_Extend extends Schema_Mongo_User {}
 
-class Test_Schema extends Epic_Mongo_Schema {
+class Schema_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_db = 'epic_mongo_test';
 	protected static $_typeMap = array(
-		'user' => 'Test_Mongo_User',
-		'post' => 'Test_Mongo_Post',
+		'user' => 'Schema_Mongo_User',
+		'post' => 'Schema_Mongo_Post',
 	);
 }
 
-class Test2_Schema extends Epic_Mongo_Schema {
+class Schema_Mongo_Schema_Extend extends Epic_Mongo_Schema {
 	protected $_db = 'epic_mongo_test2';
-	protected static $_extends = 'Test_Schema';
+	protected static $_extends = 'Schema_Mongo_Schema';
 	protected $_connection = 'test';
 	protected static $_typeMap = array(
-		'user' => 'Test2_Mongo_User'
+		'user' => 'Schema_Mongo_User_Extend'
 	);
 }
 
-class Test3_Schema extends Epic_Mongo_Schema {
-	protected static $_extends = 'Test2_Schema';
+class Schema_Mongo_Schema_Extend_Extend extends Epic_Mongo_Schema {
+	protected static $_extends = 'Schema_Mongo_Schema_Extend';
 }
 
-class Test4_Schema extends Epic_Mongo_Schema {}
+class Schema_Mongo_Schema_NoExtend extends Epic_Mongo_Schema {
+	
+}
