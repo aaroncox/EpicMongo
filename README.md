@@ -1,9 +1,12 @@
 Epic-Mongo
 ==========
 
-MongoDb ORM for PHP
+MongoDb ORM for PHP (Inspired by [Shanty Mongo](https://github.com/coen-hyde/Shanty-Mongo), but rebuilt without Zend Framework)
+
+This library is ***NOT*** complete yet, much of the functionality listed below is still in development.
 
 Features: 
+===
 
 Easy Querying
 ---
@@ -23,16 +26,16 @@ Create different document types with specific requirements, functionality and ca
 ```php
 <?php
 // A 'user' that someone would be logged in as
-class User_Class extends Epic_Mongo_Document {
+class LIB_Mongo_Document_User extends Epic_Mongo_Document {
 	// The collection the documents are saved into
 	protected static $_collectionName = 'users';
 }
 
 // A 'schema' is created for the connection to MongoDb
-class Schema_Class extends Epic_Mongo_Schema {
+class LIB_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_db = 'test_database';	// Defines which Database we use
 	protected static $_typeMap = array(
-		'user' => 'User_Class'	// This maps the 'shortname' of 'user' to the class 'User_Class'
+		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'User_Class'
 	);
 }
 ?>
@@ -55,36 +58,39 @@ $user->save();
 ```
 Document Field Requirements
 ---
-Create Requirements for specific fields on the Document Type
+Create Requirements for specific fields on the Document Type. Listed below are examples of different options:
 
-- 'Class:Name': (Optional) Forces the value of this field to be set to this Class when returned.
-- AsReference: (Optional) Converts any Document passed into this field into a reference.
-- Required: (Optional) Requires this field to be set in order to save.
+- 'doc:Class_Name': (Optional) Forces the value of this field to be set to the specified Document Class when returned.
+- 'ref:Class_Name': (Optional) Forces the value of this field to be set to the specified Document Class when returned and automatically causes the conversion into a DBRef.
+- 'req': (Optional) Requires this field to be set in order to save.
 
 ```php
 <?php
 // A 'user' that someone would be logged in as
-class User_Class extends Epic_Mongo_Document {
+class LIB_Mongo_Document_User extends Epic_Mongo_Document {
 	// The collection the documents are saved into
 	protected static $_collectionName = 'users';
 }
 
 // A 'post' that a user could create
-class User_Post extends Epic_Mongo_Document {
+class LIB_Mongo_Document_Post extends Epic_Mongo_Document {
 	// The collection the documents are saved into
 	protected static $_collectionName = 'posts';
 	// Any requirements on fields for this document
 	protected $_requirements = array(
-		'author' => array('Class:User', 'AsReference', 'Required'),	
+		// Author is a reference to a LIB_Mongo_Document_User and is required
+		'author' => array('ref:LIB_Mongo_Document_User', 'req'),	
 	);
 }
 
 // The schema must contain all of the different types
-class Schema_Class extends Epic_Mongo_Schema {
-	protected $_db = 'test_database';	// Defines which Database we use
+class LIB_Mongo_Schema extends Epic_Mongo_Schema {
+	// Which database is this schema for?
+	protected $_db = 'test_database';	
+	// A map of all types this schema supports
 	protected static $_typeMap = array(
-		'user' => 'User_Class'	// This maps the 'shortname' of 'user' to the class 'User_Class'
-		'post' => 'User_Post'	// This maps the 'shortname' of 'post' to the class 'User_Post'
+		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'User_Class'
+		'post' => 'LIB_Mongo_Document_Post'	// This maps the 'shortname' of 'post' to the class 'User_Post'
 	);
 }
 
@@ -156,7 +162,7 @@ $posts = Epic_Mongo::db('post')->find(array(), array('time' => -1))
 
 Automatic Reference Querying
 ---
-When you pass in a full object, it will convert it to a reference per the requirements
+When you pass in a full object, it will convert it to a reference per the requirements on the document type.
 
 ```php
 <?php
@@ -168,5 +174,33 @@ $query = array(
 );
 // Find all posts
 $posts = Epic_Mongo::db('post')->find($query);
+?>
+```
+
+Export a DocumentSet to an Array
+```php
+<?php
+// Find all our posts
+$posts = Epic_Mongo::db('post')->find();
+// 
+echo gettype($posts);						// Returns "object" (specifically Epic_Mongo_DocumentSet)
+echo gettype($posts->export());	// Returns "array" 
+?>
+```
+
+Create a Document from an Array
+```php
+<?php
+// Build some Sample data
+$values = array(
+	'username' => 'admin',
+	'password' => 'password',
+	'email' => 'email@email.com',
+);
+// Pass the Array into the ->setFromArray function
+$user = Epic_Mongo::new('user')->setFromArray($values);
+echo $user->username;	// returns 'admin'
+echo $user->password;	// returns 'password'
+echo $user->email;		// returns 'email@email.com'
 ?>
 ```
