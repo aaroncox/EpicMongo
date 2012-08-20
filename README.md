@@ -35,7 +35,7 @@ class LIB_Mongo_Document_User extends Epic_Mongo_Document {
 class LIB_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_db = 'test_database';	// Defines which Database we use
 	protected static $_typeMap = array(
-		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'User_Class'
+		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'LIB_Mongo_Document_User'
 	);
 }
 ?>
@@ -47,8 +47,7 @@ Easily create a new document that is properly typed.
 
 ```php
 <?php
-
-// Create a User 
+// Create a Sample User 
 $user = Epic_Mongo::new('user');	// The 'shortname' from the schema
 $user->id = 1;
 $user->username = 'admin';
@@ -60,9 +59,9 @@ Document Field Requirements
 ---
 Create Requirements for specific fields on the Document Type. Listed below are examples of different options:
 
-- 'doc:Class_Name': (Optional) Forces the value of this field to be set to the specified Document Class when returned.
-- 'ref:Class_Name': (Optional) Forces the value of this field to be set to the specified Document Class when returned and automatically causes the conversion into a DBRef.
-- 'req': (Optional) Requires this field to be set in order to save.
+- '*doc:Class_Name*': (Optional) Forces the value of this field to be set to the specified Document Class when returned.
+- '*ref:Class_Name*': (Optional) Forces the value of this field to be set to the specified Document Class when returned and automatically causes the conversion into a DBRef.
+- '*req*': (Optional) Requires this field to be set in order to save.
 
 ```php
 <?php
@@ -89,22 +88,24 @@ class LIB_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_db = 'test_database';	
 	// A map of all types this schema supports
 	protected static $_typeMap = array(
-		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'User_Class'
-		'post' => 'LIB_Mongo_Document_Post'	// This maps the 'shortname' of 'post' to the class 'User_Post'
+		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'LIB_Mongo_Document_User'
+		'post' => 'LIB_Mongo_Document_Post'	// This maps the 'shortname' of 'post' to the class 'LIB_Mongo_Document_Post'
 	);
 }
 
 // Create a User 
 $user = Epic_Mongo::new('user');	// The 'shortname' from the schema
+// Some random example data
 $user->id = 2;
 $user->username = 'author';
 $user->password = 'password';
+// Save the User
 $user->save();
 
 // Create a Post document for the User
 $post = Epic_Mongo::new('post');
 
-// Set the User as the author of the post
+// Set the User as the author of the post, no need to create a reference
 $post->author = $user;
 
 // Set Extra 'post' information
@@ -184,7 +185,6 @@ Incase the ArrayAccess and IteratorAggregate implementations don't do enough and
 <?php
 // Find all our posts
 $posts = Epic_Mongo::db('post')->find();
-// 
 echo gettype($posts); // Returns "object" (specifically Epic_Mongo_DocumentSet)
 echo gettype($posts->export()); // Returns "array" 
 ?>
