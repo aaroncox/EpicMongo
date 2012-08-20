@@ -132,7 +132,6 @@ $post = Epic_Mongo::db('post')->findOne(array('id' => 1));
 <h4><?= $post->author->username ?></h4>
 <!-- Renders the Post's Body -->
 <div><?= $post->body ?></div>
-
 ```
 
 Returns Iteratable DocumentSets
@@ -186,8 +185,8 @@ Incase the ArrayAccess and IteratorAggregate implementations don't do enough and
 // Find all our posts
 $posts = Epic_Mongo::db('post')->find();
 // 
-echo gettype($posts);						// Returns "object" (specifically Epic_Mongo_DocumentSet)
-echo gettype($posts->export());	// Returns "array" 
+echo gettype($posts); // Returns "object" (specifically Epic_Mongo_DocumentSet)
+echo gettype($posts->export()); // Returns "array" 
 ?>
 ```
 
@@ -204,9 +203,9 @@ $values = array(
 	'email' => 'email@email.com',
 );
 // Pass the Array into the ->setFromArray function
-$user = Epic_Mongo::new('user')->setFromArray($values);
-echo $user->username;	// returns 'admin'
-echo $user->password;	// returns 'password'
-echo $user->email;		// returns 'email@email.com'
+$user = Epic_Mongo::new('user')->setFromArray($values)->save();
+echo $user->username; // returns 'admin'
+echo $user->password; // returns 'password'
+echo $user->email; // returns 'email@email.com'
 ?>
 ```
