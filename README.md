@@ -178,6 +178,9 @@ $posts = Epic_Mongo::db('post')->find($query);
 ```
 
 Export a DocumentSet to an Array
+---
+Incase the ArrayAccess and IteratorAggregate implementations don't do enough and you just want an array.
+
 ```php
 <?php
 // Find all our posts
@@ -189,6 +192,9 @@ echo gettype($posts->export());	// Returns "array"
 ```
 
 Create a Document from an Array
+---
+Easily fill out a document by passing in an array of data.
+
 ```php
 <?php
 // Build some Sample data
