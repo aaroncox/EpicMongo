@@ -32,8 +32,8 @@ class Epic_Mongo
 		return static::$_connections[$name];
 	}
 
-	static public function addSchema($name, Epic_Mongo_Schema $schema) {
-		
-	}
+	// static public function addSchema($name, Epic_Mongo_Schema $schema) {
+	// 	
+	// }
 	
 }
