@@ -46,7 +46,7 @@ Easy Document Creation
 Easily create a new document that is properly typed. 
 
 ```php
-<?php
+<?php 
 // Create a Sample User 
 $user = Epic_Mongo::new('user');	// The 'shortname' from the schema
 $user->id = 1;
