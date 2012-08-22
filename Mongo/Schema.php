@@ -79,10 +79,13 @@ abstract class Epic_Mongo_Schema
 	}
 	
 	public function resolve() {
-		$args = func_get_args();
-		if(is_string($args[0])) {
-			return static::map()->getStatic($args[0]);
+		$return = $this;
+		$argv = func_get_args();
+		$argc = count($argv);
+		if($argc == 1 && is_string($argv[0])) {
+			$return = static::map()->getStatic($argv[0]);
 		}
+		return $return;
 	}
 } // END class Epic_Mongo_Schema
 /*

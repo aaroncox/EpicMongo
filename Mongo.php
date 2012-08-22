@@ -50,9 +50,6 @@ class Epic_Mongo
 	
 	static public function __callStatic($name, $args) {
 		$schema = static::getSchema($name);
-		if(count($args) == 0) {
-			return $schema;
-		}
 		return call_user_func_array(array($schema, 'resolve'), $args);
 	}
 	
