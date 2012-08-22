@@ -42,7 +42,6 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 		$schema = new Schema_Mongo_Schema;
 		$connection = $schema->getMongoDb();
 		$this->assertInstanceOf('MongoDB', $connection);	
-		echo $connection."";	
 	}
 	
 	/**

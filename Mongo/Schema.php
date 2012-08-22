@@ -78,6 +78,12 @@ abstract class Epic_Mongo_Schema
 		return static::$_typeMap;
 	}
 	
+	public function resolve() {
+		$args = func_get_args();
+		if(is_string($args[0])) {
+			return static::map()->getStatic($args[0]);
+		}
+	}
 } // END class Epic_Mongo_Schema
 /*
 

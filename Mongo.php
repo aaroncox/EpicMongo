@@ -12,6 +12,8 @@ require_once($baseDir . "/Mongo/Iterator/Document.php");
 */
 class Epic_Mongo
 {	
+	static protected $_schemas = array();
+	
 	static protected $_connections = array();
 	
 	static public function addConnection($name, $string = null, $options = array()) {
@@ -32,8 +34,26 @@ class Epic_Mongo
 		return static::$_connections[$name];
 	}
 
-	// static public function addSchema($name, Epic_Mongo_Schema $schema) {
-	// 	
-	// }
+	static public function addSchema($name, Epic_Mongo_Schema $schema) {
+		if(isset(static::$_schemas[$name])) {
+			throw new Epic_Mongo_Exception($name . ' already exist.');
+		}
+		return static::$_schemas[$name] = $schema;
+	}
+	
+	static public function getSchema($name) {
+		if(!isset(static::$_schemas[$name])) {
+			throw new Epic_Mongo_Exception($name . ' does not exist.');
+		}
+		return static::$_schemas[$name];
+	}
+	
+	static public function __callStatic($name, $args) {
+		$schema = static::getSchema($name);
+		if(count($args) == 0) {
+			return $schema;
+		}
+		return call_user_func_array(array($schema, 'resolve'), $args);
+	}
 	
 }
