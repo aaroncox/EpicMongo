@@ -13,7 +13,7 @@ class Epic_Mongo_Connection extends Mongo
 	{
 		if (is_null($connectionString)) $connectionString = '127.0.0.1';
 		
-		$options['connect'] = false;
+		// $options['connect'] = false;
 		
 		$this->_connectionInfo = $options;
 		$this->_connectionInfo['connectionString'] = $connectionString;
