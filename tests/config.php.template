@@ -1,0 +1,3 @@
+<?php
+// Sets connection string for tests
+define('TEST_CONNECTION_STRING', '127.0.0.1');
