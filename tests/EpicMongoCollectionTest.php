@@ -34,6 +34,10 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 	public function testIsDocumentClass() {
 		$this->assertFalse(Collection_Mongo_Collection::isDocumentClass());
 	}
+	
+	public function testFind() {
+		$this->assertInstanceOf('MongoCursor', Epic_Mongo::testCollection('test')->find());
+	}
 } // END class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 
 
@@ -42,6 +46,12 @@ class Collection_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_typeMap = array(
 		'test' => 'Collection_Mongo_Collection',
 	);
+	public function init() {
+		$this->_db = 'test_'.time();
+	}
+	public function __destroy() {
+		// $this->getMongoDb()->drop();
+	}
 }
 
 class Collection_Mongo_Collection extends Epic_Mongo_Collection {

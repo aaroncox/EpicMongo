@@ -29,11 +29,20 @@ class Epic_Mongo_Collection
 		return $this->_schema;
 	}
 	
-	// public function find($query = array()) {
-	// 	if(!$this->_collection) {
-	// 		throw new Epic_Mongo_Exception("Collection not specified.");
-	// 	}	
-	// }
+	public function setCollection($name) {
+		$this->_collection = $name;
+		return $this;
+	}
+	
+	public function getCollection() {
+		return $this->_collection;
+	}
+	
+	public function find($query = array(), $fields = array()) {
+		$db = $this->getSchema()->getMongoDb();
+		$collection = $db->selectCollection($this->getCollection());
+		return $cursor = $collection->find($query, $fields);
+	}
 	
 	/**
 	 * Is this class a document class
