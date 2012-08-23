@@ -59,7 +59,7 @@ class Epic_Mongo_Map
 			}
 			$pass[$config]['schema'] = $this->_schema;
 		}
-		return $reflector->newInstanceArgs($pass);
+		return call_user_func_array(array($reflector, 'newInstance'), $pass);
 	}
 	
 } // END class Epic_Mongo_Map
