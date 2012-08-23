@@ -7,15 +7,15 @@
  **/
 abstract class Epic_Mongo_Schema
 {
-	protected static $_typeMap;
-	protected static $_extends = null;
+	protected $_typeMap = null;
+	protected $_extends = null;
 	protected $_extendSchema = null;
 	protected $_connection = null;	
 	protected $_db = null;
 	
 	function __construct() {
-		if(static::$_extends) {
-			$this->_extendSchema = new static::$_extends;
+		if($this->_extends) {
+			$this->_extendSchema = new $this->_extends;
 			if($this->_db) {
 				$this->_extendSchema->setDb($this->_db);	
 			}
@@ -62,20 +62,20 @@ abstract class Epic_Mongo_Schema
 		$this->_db = $db;
 	}
 	
-	public static function map() {
+	public function map() {
 		// Create the typeMap if it doesn't exist
-		if(!static::$_typeMap instanceOf Epic_Mongo_Map) {
-			$initial = static::$_typeMap;
-			if(static::$_extends) {
-				static::$_typeMap = call_user_func(array(static::$_extends, 'map'));
+		if(!$this->_typeMap instanceOf Epic_Mongo_Map) {
+			$initial = $this->_typeMap;
+			if($this->_extends) {
+				$this->_typeMap = $this->_extendSchema->map();
 			} else {
-				static::$_typeMap = new Epic_Mongo_Map;				
+				$this->_typeMap = new Epic_Mongo_Map($this);				
 			}
 			if(is_array($initial)) {
-				static::$_typeMap->addType($initial);				
+				$this->_typeMap->addType($initial);				
 			}
 		}
-		return static::$_typeMap;
+		return $this->_typeMap;
 	}
 	
 	public function resolve() {
@@ -83,7 +83,7 @@ abstract class Epic_Mongo_Schema
 		$argv = func_get_args();
 		$argc = count($argv);
 		if($argc == 1 && is_string($argv[0])) {
-			$return = static::map()->getStatic($argv[0]);
+			$return = $this->map()->getStatic($argv[0]);
 		}
 		return $return;
 	}

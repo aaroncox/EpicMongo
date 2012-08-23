@@ -17,5 +17,33 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 	{
 		$this->assertTrue(class_exists('Epic_Mongo_Collection'));
 	}
+	
+	public function testAddSchema() {
+		Epic_Mongo::addSchema('testCollection', new Collection_Mongo_Schema);
+		$this->assertInstanceOf('Epic_Mongo_Schema', Epic_Mongo::getSchema('testCollection'));
+	}
 
+	/**
+	 * @depends testAddSchema
+	 **/
+	public function testGetCollection() {
+		$this->assertInstanceOf('Epic_Mongo_Collection', Epic_Mongo::testCollection('test'));
+		$this->assertEquals(Epic_Mongo::testCollection(), Epic_Mongo::testCollection('test')->getSchema());
+	}
+	
+	public function testIsDocumentClass() {
+		$this->assertFalse(Collection_Mongo_Collection::isDocumentClass());
+	}
 } // END class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
+
+
+
+class Collection_Mongo_Schema extends Epic_Mongo_Schema {
+	protected $_typeMap = array(
+		'test' => 'Collection_Mongo_Collection',
+	);
+}
+
+class Collection_Mongo_Collection extends Epic_Mongo_Collection {
+	protected $_collection = 'test';
+}

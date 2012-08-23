@@ -11,6 +11,12 @@ class Epic_Mongo_Map
 	
 	protected $_static = array();
 	
+	protected $_schema = null;
+	
+	public function __construct(Epic_Mongo_Schema $schema = null) {
+		$this->_schema = $schema;
+	}
+	
 	public function addType($type, $class = false) {
 		if(is_array($type)) {
 			foreach($type as $key => $value) {
@@ -43,7 +49,17 @@ class Epic_Mongo_Map
 	
 	public function getInstance($type) {
 		$class = $this->getClass($type);
-		return new $class;
+		$argv = func_get_args();
+		$pass = array_slice($argv, 1);
+		$reflector = new ReflectionClass($class);
+		if(method_exists($class, 'isDocumentClass') && $this->_schema) {
+			$config = $class::isDocumentClass() ? 1 : 0;			
+			if(!isset($pass[$config])) {
+				$pass[$config] = array();
+			}
+			$pass[$config]['schema'] = $this->_schema;
+		}
+		return $reflector->newInstanceArgs($pass);
 	}
 	
 } // END class Epic_Mongo_Map

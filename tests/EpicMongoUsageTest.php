@@ -22,7 +22,7 @@
 // 
 // class Usage_Mongo_Schema extends Epic_Mongo_Schema {
 // 	protected $_db = 'epic_mongo_test';
-// 	protected static $_typeMap = array(
+// 	protected $_typeMap = array(
 // 		'user' => 'Usage_Mongo_User',
 // 		'post' => 'Usage_Mongo_Post',
 // 	);

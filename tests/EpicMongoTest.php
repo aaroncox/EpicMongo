@@ -53,7 +53,7 @@ class EpicMongoTest extends PHPUnit_Framework_TestCase
 } // END class EpicMongoTest extends PHPUnit_Framework_TestCase
 
 class Mongo_Mongo_Schema extends Epic_Mongo_Schema {
-	static protected $_typeMap = array(
+	protected $_typeMap = array(
 		'test' => 'Mongo_Mongo_Document_Test'
 	);
 }

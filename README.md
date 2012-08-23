@@ -34,7 +34,7 @@ class LIB_Mongo_Document_User extends Epic_Mongo_Document {
 // A 'schema' is created for the connection to MongoDb
 class LIB_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_db = 'test_database';	// Defines which Database we use
-	protected static $_typeMap = array(
+	protected $_typeMap = array(
 		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'LIB_Mongo_Document_User'
 	);
 }
@@ -87,7 +87,7 @@ class LIB_Mongo_Schema extends Epic_Mongo_Schema {
 	// Which database is this schema for?
 	protected $_db = 'test_database';	
 	// A map of all types this schema supports
-	protected static $_typeMap = array(
+	protected $_typeMap = array(
 		'user' => 'LIB_Mongo_Document_User'	// This maps the 'shortname' of 'user' to the class 'LIB_Mongo_Document_User'
 		'post' => 'LIB_Mongo_Document_Post'	// This maps the 'shortname' of 'post' to the class 'LIB_Mongo_Document_Post'
 	);
