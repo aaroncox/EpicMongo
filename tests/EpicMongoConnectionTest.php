@@ -19,19 +19,46 @@ class EpicMongoConnectionTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(TEST_CONNECTION_STRING, $info['connectionString']);
 		$this->assertInstanceOf('Mongo', $connection);
 	}
-	
+
+	public function testDefaultConnection() {
+		$connection = Connect_Test_Epic_Mongo::getConnection();
+		$info = $connection->getConnectionInfo();
+		$this->assertEquals("127.0.0.1", $info['connectionString']);
+	}
+
 	/**
-   * @expectedException Epic_Mongo_Exception
-   */
+	 * @expectedException Epic_Mongo_Exception
+	 */
 	public function testAddConnectionException() {
 		Epic_Mongo::addConnection('default');
 	}
 
+	public function testNewConnection()
+	{
+		$connection = new Epic_Mongo_Connection;
+		$info = $connection->getConnectionInfo();
+		$this->assertEquals('127.0.0.1', $info['connectionString']);
+		Connect_Test_Epic_Mongo::addConnection('test-new-connection', $connection);
+	}
+
+	public function testNewConnectionString()
+	{
+		Connect_Test_Epic_Mongo::addConnection('test-new-connection-string', TEST_CONNECTION_STRING);
+		$info = Connect_Test_Epic_Mongo::getConnection('test-new-connection-string')->getConnectionInfo();
+		$this->assertEquals('127.0.0.1', $info['connectionString']);
+		
+	}
+
+
 	/**
-   * @expectedException Epic_Mongo_Exception
-   */
+	 * @expectedException Epic_Mongo_Exception
+	 */
 	public function testGetConnectionException() {
 		Epic_Mongo::getConnection('doesnt_exist');
 	}
-	
+
 } // END class EpicMongoConnectionTest extends PHPUnit_Framework_TestCase
+
+class Connect_Test_Epic_Mongo extends Epic_Mongo {
+	protected static $_connections = array();
+}

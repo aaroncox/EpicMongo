@@ -11,7 +11,9 @@ class Epic_Mongo_Connection extends Mongo
 	
 	public function __construct($connectionString = null, array $options = array())
 	{
-		if (is_null($connectionString)) $connectionString = '127.0.0.1';
+		if (is_null($connectionString)) {
+			$connectionString = '127.0.0.1';
+		}
 		
 		// $options['connect'] = false;
 		

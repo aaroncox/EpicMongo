@@ -21,7 +21,11 @@ class Epic_Mongo
 		if(isset(static::$_connections[$name])) {
 			throw new Epic_Mongo_Exception($name . ' already exists.');
 		}
-		static::$_connections[$name] = new Epic_Mongo_Connection($string, $options);
+		if ($string instanceOf Epic_Mongo_Connection) {
+			static::$_connections[$name] = $string;
+		} else {
+			static::$_connections[$name] = new Epic_Mongo_Connection($string, $options);
+		}
 	}
 	
 	static public function getConnection($name = 'default') {
