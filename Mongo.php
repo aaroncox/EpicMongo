@@ -1,12 +1,13 @@
 <?php
 $baseDir = dirname(__FILE__);
-require_once($baseDir . "/Mongo/Exception.php");
-require_once($baseDir . "/Mongo/Map.php");
-require_once($baseDir . "/Mongo/Connection.php");
-require_once($baseDir . "/Mongo/Schema.php");
 require_once($baseDir . "/Mongo/Collection.php");
+require_once($baseDir . "/Mongo/Connection.php");
 require_once($baseDir . "/Mongo/Document.php");
+require_once($baseDir . "/Mongo/Exception.php");
+require_once($baseDir . "/Mongo/Iterator/Cursor.php");
 require_once($baseDir . "/Mongo/Iterator/Document.php");
+require_once($baseDir . "/Mongo/Map.php");
+require_once($baseDir . "/Mongo/Schema.php");
 /**
 *	Epic_Mongo 
 */
