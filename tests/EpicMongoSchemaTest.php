@@ -66,6 +66,26 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('Schema_Mongo_Post', $schema2->map()->getClass('post'));
 	}
 	
+	public function testNewDocument() {
+		$schema = new Schema_Mongo_Schema;
+		$doc = $schema->resolve("doc:user");
+		$doc2 = $schema->resolve("doc:user", array('test' => 'test'));
+		$this->assertInstanceOf('Schema_Mongo_User', $doc);
+		$this->assertEquals('test', $doc2->test);
+		$this->assertFalse($doc === $doc2, 'Ensure documents are different.');
+		$static = $schema->resolve("user");
+		$this->assertFalse($static === $doc);
+		$this->assertFalse($static === $doc2);
+	}
+	
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+	public function testUnknownResolveTypeException() {
+		$schema = new Schema_Mongo_Schema;
+		$doc = $schema->resolve("bad:user");
+	}
+	
 } // END class EpicMongoTest extends PHPUnit_Framework_TestCase
 
 class Schema_Mongo_Post extends Epic_Mongo_Document {}

@@ -82,8 +82,32 @@ abstract class Epic_Mongo_Schema
 		$return = $this;
 		$argv = func_get_args();
 		$argc = count($argv);
-		if($argc == 1 && is_string($argv[0])) {
-			$return = $this->map()->getStatic($argv[0]);
+		if($argc >= 1 && is_string($argv[0])) {
+			$return = call_user_func_array(array($this, 'resolveString'), $argv);
+		}
+		return $return;
+	}
+	
+	public function resolveString($type) {
+		$argv = func_get_args();
+		$map = $this->map();
+		$parts = explode(":", $type);
+		if(count($parts) == 1) {
+			$return = $map->getStatic($type);			
+		} else {
+			switch($parts[0]) {
+				case "doc":
+				case "set":
+					if(!$map->hasClass($type)) {
+						$type = $parts[1];
+					}
+					$pass = $argv;
+					$pass[0] = $type;
+					$return = call_user_func_array(array($map, 'getInstance'), $pass);
+					break;
+				default:
+					throw new Epic_Mongo_Exception("Unknown resolve type: [" . $type . "]");
+			}
 		}
 		return $return;
 	}
