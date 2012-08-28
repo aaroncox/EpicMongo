@@ -9,9 +9,11 @@ class Epic_Mongo_Collection
 {
 	protected $_collection = null;
 	protected $_schema = null;
+	protected $_config = array();
 	
 	public function __construct($config = array()) {
 		$class = get_called_class();
+		$this->_config = $config;
 		foreach($config as $k => $v) {
 			$method = 'set' . ucfirst($k);
 			if(method_exists($class, $method)) {

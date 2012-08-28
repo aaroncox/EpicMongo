@@ -125,6 +125,43 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc = new Epic_Mongo_Document();
 		$doc->getIterator()->seek('test');
 	}
+
+	public function testDocumentSetDetection()
+	{
+		$data = array(
+			'set' => array(
+				'1', '2', '3',
+				array(
+					'test' => 'test'
+				)
+			)
+		);
+		$doc = new Epic_Mongo_Document($data);
+		$this->assertInstanceOf("Epic_Mongo_DocumentSet", $doc->set);
+		$this->assertEquals("2", $doc->set[1]);
+		$this->assertEquals("test", $doc->set[3]->test);
+	}
+
+	public function testExport()
+	{
+		$data = array(
+			'test' => true,
+			'testInner' => array(
+				'tested' => true
+			),
+			'testNull' => null,
+			'testEmptyDoc' => array(),
+			'testArrayLike' => array(
+				'1', '2', '3'
+			)
+		);
+		$doc = new Epic_Mongo_Document($data);
+
+		$exported = $doc->export();
+		unset($data['testNull']);
+		$data['testEmptyDoc'] = null;
+		$this->assertEquals($data, $exported);
+	}
 } // END class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 
 class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {

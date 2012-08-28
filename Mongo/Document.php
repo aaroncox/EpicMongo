@@ -15,6 +15,22 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		$this->_cleanData = $data;
 	}
 
+	public function export() {
+		return iterator_to_array(new Epic_Mongo_Iterator_Export($this->getIterator()));
+	}
+
+	// internal function to determine if the array $data has any non-numeric keys
+	protected function _dataIsSimpleArray(array $data)
+	{
+		$keys = array_keys($data);
+		foreach($keys as $k){
+			if (is_string($k)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public function getProperty($key) {
 		// if the data has already been loaded
 		if(array_key_exists($key, $this->_data)) {
@@ -26,8 +42,17 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			$data = $this->_cleanData[$key];
 		}
 		// if the cleanData is an array, we do special things, otherwise, we just return it.
-		// if(is_array($data)) {
-		// }
+		if(is_array($data)) {
+			// TODO: Implement requirements checking here
+
+			$documentClass = "Epic_Mongo_Document";
+
+			if($this->_dataIsSimpleArray($data)) {
+				$documentClass = "Epic_Mongo_DocumentSet";
+			}
+
+			$data = new $documentClass($data, $this->_config);
+		}
 		return $this->_data[$key] = $data;
 	}
 
