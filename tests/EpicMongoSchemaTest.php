@@ -62,7 +62,7 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 	public function testMapArrayExtend() {
 		$schema1 = new Schema_Mongo_Schema;
 		$schema2 = new Schema_Mongo_Schema_Extend;
-		$this->assertEquals('Schema_Mongo_User', $schema->map()->getClass('user'));
+		$this->assertEquals('Schema_Mongo_User', $schema1->map()->getClass('user'));
 		$this->assertEquals('Schema_Mongo_User_Extend', $schema2->map()->getClass('user'));
 		$this->assertEquals('Schema_Mongo_Post', $schema2->map()->getClass('post'));
 	}
