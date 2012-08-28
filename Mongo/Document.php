@@ -7,26 +7,56 @@
  **/
 class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, Countable, IteratorAggregate
 {
-	protected $_data = array(); 
+	protected $_cleanData = array();
+	protected $_data = array();
 	public function __construct($data = array(), $config = array()) {
 		parent::__construct($config);
-		$this->_data = $data;
+		$this->_cleanData = $data;
 	}
 	public function getProperty($key) {
+		// if the data has already been loaded
 		if(array_key_exists($key, $this->_data)) {
 			return $this->_data[$key];
 		}
-		return null;
+		$data = null;
+		// read from cleanData
+		if(array_key_exists($key, $this->_cleanData)) {
+			$data = $this->_cleanData[$key];
+		}
+		// if the cleanData is an array, we do special things, otherwise, we just return it.
+		// if(is_array($data)) {
+		// }
+		return $this->_data[$key] = $data;
 	}
 	public function setProperty($key, $value) {
 		$this->_data[$key]= $value;
 		return $value;
 	}
 	public function hasProperty($key) {
-		return array_key_exists($key, $this->_data) && $this->_data[$key] !== null;
+		if(array_key_exists($key, $this->_data)) {
+			return !is_null($this->_data[$key]);
+		}
+		return array_key_exists($key, $this->_cleanData) && !is_null($this->_cleanData[$key]); 
 	}
 	public function getPropertyKeys() {
-		return array_keys($this->_data);
+		$keyList = array();
+		$ignore = array();
+		foreach($this->_data as $key=>$value) {
+			if(is_null($value)) {
+				$ignore[] = $key;
+			} else {
+				$keyList[] = $key;
+			}
+		}
+		foreach($this->_cleanData as $key=>$value) {
+			if(in_array($key, $ignore)) {
+				continue;
+			}
+			if(!is_null($value)) {
+				$keyList[] = $key;
+			}
+		}
+		return $keyList;
 	}
 	
 	public function __get($property) {

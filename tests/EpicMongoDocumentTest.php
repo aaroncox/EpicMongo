@@ -61,12 +61,40 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 			'k3' => 'v3',
 		);
 		$doc = new Epic_Mongo_Document($data);
+		$count = 0;
 		foreach($doc as $k => $v) {
-			$this->assertEquals($data[$k], $v);
+			$count++;
+			$this->assertEquals($data[$k], $v, "Data matched for key $k");
 		}
+		$this->assertEquals(3, $count, "Iterated over all three keys");
 		$iterator = $doc->getIterator();
 		$iterator->seek('k3');
 		$this->assertEquals('v3', $iterator->current());
+	}
+
+	public function testDirtyDataIterator()
+	{
+		$cleanData = array(
+			'k1' => 'v1',
+			'k2' => 'v2',
+			'k3' => 'v3'
+		);
+		$doc = new Epic_Mongo_Document($cleanData);
+		$doc->k1 = null;
+		$doc->k2 = 'v4';
+		$doc->k5 = 'v5';
+		$expected = array(
+			'k2' => 'v4',
+			'k3' => 'v3',
+			'k5' => 'v5'
+		);
+		$count = 0;
+		foreach($doc as $k => $v) {
+			$count++;
+			$this->assertEquals($expected[$k], $v, "Data matched for key $k");
+		}
+		$this->assertEquals(3, count($expected), "Iterated over all expected keys");
+		
 	}
 	
 	public function testRecursiveIterator() {
