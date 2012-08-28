@@ -60,7 +60,7 @@ class Collection_Mongo_Schema extends Epic_Mongo_Schema {
 		$this->_db = 'test_'.time();
 	}
 	public function __destroy() {
-		// $this->getMongoDb()->drop();
+		$this->getMongoDb()->command(array("dropDatabase" => 1));
 	}
 }
 
