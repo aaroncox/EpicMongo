@@ -33,6 +33,10 @@ class Epic_Mongo_Map
 		$this->_map[$type] = $class;
 	}
 	
+	public function hasClass($type) {
+		return array_key_exists($type, $this->_map);
+	}
+	
 	public function getClass($type) {
 		if(!isset($this->_map[$type])) {
 			throw new Epic_Mongo_Exception($type . " has not be defined.");
@@ -46,7 +50,7 @@ class Epic_Mongo_Map
 		}
 		return $this->_static[$type] = $this->getInstance($type);
 	}
-	
+		
 	public function getInstance($type) {
 		$class = $this->getClass($type);
 		$argv = func_get_args();

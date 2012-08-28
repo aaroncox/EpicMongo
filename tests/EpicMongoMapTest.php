@@ -27,6 +27,8 @@ class EpicMongoMapTest extends PHPUnit_Framework_TestCase
 		$map = new Epic_Mongo_Map;
 		$map->addType('test', 'Test_Mapper_Class');
 		$this->assertEquals($map->getClass('test'), 'Test_Mapper_Class');
+		$this->assertTrue($map->hasClass('test'));
+		$this->assertFalse($map->hasClass('nope'));
 	}
 	
 	/**
