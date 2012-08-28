@@ -9,6 +9,10 @@ if(!defined('TEST_CONNECTION_STRING')) {
 }
 Epic_Mongo::addConnection('default', TEST_CONNECTION_STRING);
 
+
+/**
+ * @codeCoverageIgnore
+ */
 class MongoDb_TestHarness {
 	static private $_instance = null;
 	public static function getInstance() {
