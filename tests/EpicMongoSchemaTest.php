@@ -76,6 +76,7 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 		$static = $schema->resolve("user");
 		$this->assertFalse($static === $doc);
 		$this->assertFalse($static === $doc2);
+		$this->assertInstanceOf('Schema_Mongo_Document', $schema->resolve('doc:collection'));
 	}
 	
 	/**
@@ -85,18 +86,30 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 		$schema = new Schema_Mongo_Schema;
 		$doc = $schema->resolve("bad:user");
 	}
+
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+	public function testBadTypeException() {
+		$schema = new Schema_Mongo_Schema;
+		$doc = $schema->resolve("doc:bad");
+	}
 	
 } // END class EpicMongoTest extends PHPUnit_Framework_TestCase
 
 class Schema_Mongo_Post extends Epic_Mongo_Document {}
 class Schema_Mongo_User extends Epic_Mongo_Document {}
 class Schema_Mongo_User_Extend extends Schema_Mongo_User {}
+class Schema_Mongo_Collection extends Epic_Mongo_Collection {}
+class Schema_Mongo_Document extends Epic_Mongo_Document {}
 
 class Schema_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_db = 'epic_mongo_test';
 	protected $_typeMap = array(
 		'user' => 'Schema_Mongo_User',
 		'post' => 'Schema_Mongo_Post',
+		'collection' => 'Schema_Mongo_Collection',
+		'doc:collection' => 'Schema_Mongo_Document',
 	);
 }
 
