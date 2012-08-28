@@ -17,7 +17,7 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 	{
 		$this->assertTrue(class_exists('Epic_Mongo_Collection'));
 	}
-	
+
 	public function testAddSchema() {
 		Epic_Mongo::addSchema('testCollection', new Collection_Mongo_Schema);
 		$this->assertInstanceOf('Epic_Mongo_Schema', Epic_Mongo::getSchema('testCollection'));
@@ -30,11 +30,21 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Epic_Mongo_Collection', Epic_Mongo::testCollection('test'));
 		$this->assertEquals(Epic_Mongo::testCollection(), Epic_Mongo::testCollection('test')->getSchema());
 	}
-	
+
 	public function testIsDocumentClass() {
 		$this->assertFalse(Collection_Mongo_Collection::isDocumentClass());
 	}
-	
+
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+
+	public function testRequiredSchema()
+	{
+		$collection = new Collection_Mongo_Collection;
+		$collection->getSchema();
+	}
+
 	public function testFind() {
 		$this->assertInstanceOf('MongoCursor', Epic_Mongo::testCollection('test')->find());
 	}

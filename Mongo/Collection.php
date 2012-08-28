@@ -24,8 +24,11 @@ class Epic_Mongo_Collection
 		$this->_schema = $schema;
 		return $this;
 	}
-	
+
 	public function getSchema() {
+		if (!$this->_schema) {
+			throw new Epic_Mongo_Exception("Schema required");
+		}
 		return $this->_schema;
 	}
 	
