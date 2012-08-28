@@ -46,7 +46,8 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 	}
 
 	public function testFind() {
-		$this->assertInstanceOf('MongoCursor', Epic_Mongo::testCollection('test')->find());
+		$cursor = Epic_Mongo::testCollection('test')->find();
+		$this->assertInstanceOf('Epic_Mongo_Iterator_Cursor', $cursor);
 	}
 } // END class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 

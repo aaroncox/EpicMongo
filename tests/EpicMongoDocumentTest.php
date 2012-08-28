@@ -82,7 +82,14 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$children->seek('test');
 		$this->assertEquals('value', $children->current());
 	}
-	
+
+	public function testCollectionMethods()
+	{
+		$schema = new Test_Document_Mongo_Schema();
+		$cursor = $schema->resolve('test')->find();
+		$this->assertInstanceOf("Epic_Mongo_Iterator_Cursor", $cursor);
+	}
+
 	/**
    * @expectedException OutOfBoundsException
    */
@@ -91,3 +98,19 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc->getIterator()->seek('test');
 	}
 } // END class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
+
+class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
+	protected $_typeMap = array(
+		'test' => 'Test_Document_Mongo_Document',
+	);
+	public function init() {
+		$this->_db = 'test_'.time();
+	}
+	public function __destroy() {
+		$this->getMongoDb()->command(array("dropDatabase" => 1));
+	}
+}
+
+class Test_Document_Mongo_Document extends Epic_Mongo_Document {
+	protected $_collection = 'test';
+}

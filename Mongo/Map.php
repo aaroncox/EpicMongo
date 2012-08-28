@@ -53,7 +53,10 @@ class Epic_Mongo_Map
 		$pass = array_slice($argv, 1);
 		$reflector = new ReflectionClass($class);
 		if(method_exists($class, 'isDocumentClass') && $this->_schema) {
-			$config = $class::isDocumentClass() ? 1 : 0;			
+			$config = $class::isDocumentClass() ? 1 : 0;
+			if(!isset($pass[0])) {
+				$pass[0] = array();
+			}
 			if(!isset($pass[$config])) {
 				$pass[$config] = array();
 			}

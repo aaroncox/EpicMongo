@@ -7,11 +7,10 @@
  **/
 class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, Countable, IteratorAggregate
 {
-	protected $_data; 
-	protected $_config;
+	protected $_data = array(); 
 	public function __construct($data = array(), $config = array()) {
+		parent::__construct($config);
 		$this->_data = $data;
-		$this->_config = $config;
 	}
 	public function getProperty($key) {
 		if(array_key_exists($key, $this->_data)) {

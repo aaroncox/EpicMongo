@@ -44,7 +44,8 @@ class Epic_Mongo_Collection
 	public function find($query = array(), $fields = array()) {
 		$db = $this->getSchema()->getMongoDb();
 		$collection = $db->selectCollection($this->getCollection());
-		return $cursor = $collection->find($query, $fields);
+		$cursor = $collection->find($query, $fields);
+		return new Epic_Mongo_Iterator_Cursor($cursor);
 	}
 	
 	/**
