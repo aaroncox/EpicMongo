@@ -104,10 +104,7 @@ class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
 		'test' => 'Test_Document_Mongo_Document',
 	);
 	public function init() {
-		$this->_db = 'test_'.time();
-	}
-	public function __destroy() {
-		$this->getMongoDb()->command(array("dropDatabase" => 1));
+		$this->_db = MongoDb_TestHarness::getInstance()->dbName;
 	}
 }
 

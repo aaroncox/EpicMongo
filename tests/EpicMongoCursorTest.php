@@ -13,7 +13,7 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 		if($this->_harness) {
 			return $this->_harness; 
 		}
-		return $this->_harness = new Mongo_Iterator_TestHarness;
+		return $this->_harness = MongoDb_TestHarness::getInstance();
 	}
 		/**
 	 * testEpicMongoCursorTest
@@ -84,6 +84,7 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 			return $this_numbers;
 		}
 		$db = $this->getHarness()->getMongoDb();
+		$db->dropCollection('iteratorsnumber');
 		$collection = $db->selectCollection('iteratorsnumber');
 		for($i = 0; $i < 100; $i++ ) {
 			$collection->insert(array("i" => $i), array('safe' => true));			
@@ -113,16 +114,3 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 } // END class EpicMongoCursorTest extends PHPUnit_Framework_TestCase
 
 class Iterator_Mongo_Document_Test extends Epic_Mongo_Document {}
-
-class Mongo_Iterator_TestHarness {
-	public $dbName;
-	public function __construct() {
-		$this->dbName = 'test-' . md5(time() . rand());
-	}
-	public function __destruct() {
-		$this->getMongoDb()->command(array("dropDatabase" => 1));
-	}
-	public function getMongoDb() {
-		return Epic_Mongo::getConnection('default')->selectDB($this->dbName);
-	}
-}
