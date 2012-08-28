@@ -1,11 +1,10 @@
 <?php
 /**
- * @category   Shanty
- * @package    Shanty_Mongo
- * @copyright  Shanty Tech Pty Ltd
- * @license    New BSD License
- * @author     Coen Hyde
- */
+ * undocumented class
+ *
+ * @package default
+ * @author Aaron Cox
+ **/
 class Epic_Mongo_Iterator_Cursor implements Iterator, Countable
 {
 	protected $_cursor = null;
@@ -40,7 +39,7 @@ class Epic_Mongo_Iterator_Cursor implements Iterator, Countable
 	public function getCollection()
 	{
 		if(array_key_exists('collection', $this->_config)) {
-			return $this->_config['collection'];			
+			return $this->_config['collection'];
 		}
 		return null;
 	}
@@ -85,7 +84,7 @@ class Epic_Mongo_Iterator_Cursor implements Iterator, Countable
 		$documentClass = $this->getDocumentClass();
 
 		// TODO - Check _type of data
-		
+
 		return new $documentClass($data, $config);
 	}
 

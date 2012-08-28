@@ -9,10 +9,12 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 {
 	protected $_cleanData = array();
 	protected $_data = array();
+
 	public function __construct($data = array(), $config = array()) {
 		parent::__construct($config);
 		$this->_cleanData = $data;
 	}
+
 	public function getProperty($key) {
 		// if the data has already been loaded
 		if(array_key_exists($key, $this->_data)) {
@@ -28,16 +30,19 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		// }
 		return $this->_data[$key] = $data;
 	}
+
 	public function setProperty($key, $value) {
 		$this->_data[$key]= $value;
 		return $value;
 	}
+
 	public function hasProperty($key) {
 		if(array_key_exists($key, $this->_data)) {
 			return !is_null($this->_data[$key]);
 		}
-		return array_key_exists($key, $this->_cleanData) && !is_null($this->_cleanData[$key]); 
+		return array_key_exists($key, $this->_cleanData) && !is_null($this->_cleanData[$key]);
 	}
+
 	public function getPropertyKeys() {
 		$keyList = array();
 		$ignore = array();
@@ -58,17 +63,17 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		}
 		return $keyList;
 	}
-	
+
 	public function __get($property) {
 		return $this->getProperty($property);
 	}
-	
+
 	public function __set($property, $value) {
-		return $this->setProperty($property, $value);		
+		return $this->setProperty($property, $value);
 	}
 	/**
 	 * Get an offset
-	 * 
+	 *
 	 * @param string $offset
 	 * @return mixed
 	 */
@@ -79,7 +84,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 	/**
 	 * set an offset
-	 * 
+	 *
 	 * @param string $offset
 	 * @param mixed $value
 	 */
@@ -90,7 +95,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 	/**
 	 * Test to see if an offset exists
-	 * 
+	 *
 	 * @param string $offset
 	 */
 	public function offsetExists($offset)
@@ -100,7 +105,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 	/**
 	 * Unset a property
-	 * 
+	 *
 	 * @param string $offset
 	 */
 	public function offsetUnset($offset)
@@ -110,7 +115,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 	/**
 	 * Count all properties in this document
-	 * 
+	 *
 	 * @return int
 	 */
 	public function count()
@@ -120,7 +125,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 	/**
 	 * Get the document iterator
-	 * 
+	 *
 	 * @return Shanty_Mongo_DocumentIterator
 	 */
 	public function getIterator()
