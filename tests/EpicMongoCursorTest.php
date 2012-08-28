@@ -81,7 +81,7 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 	
 	public function getNumbersCollection() {
 		if($this->_numbers) {
-			return $this_numbers;
+			return $this->numbers;
 		}
 		$db = $this->getHarness()->getMongoDb();
 		$db->dropCollection('iteratorsnumber');
