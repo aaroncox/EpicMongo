@@ -10,58 +10,58 @@ abstract class Epic_Mongo_Schema
 	protected $_typeMap = null;
 	protected $_extends = null;
 	protected $_extendSchema = null;
-	protected $_connection = null;	
+	protected $_connection = null;
 	protected $_db = null;
-	
+
 	function __construct() {
 		if($this->_extends) {
 			$this->_extendSchema = new $this->_extends;
 			if($this->_db) {
-				$this->_extendSchema->setDb($this->_db);	
+				$this->_extendSchema->setDb($this->_db);
 			}
 			if($this->_connection !== null) {
-				$this->_extendSchema->setConnection($this->_connection);	
+				$this->_extendSchema->setConnection($this->_connection);
 			}
 		}
 		$this->init();
 	}
-	
+
 	function init() {
-		
+
 	}
-	
+
 	public function getMongoDb() {
 		return Epic_Mongo::getConnection($this->getConnection())->selectDB($this->getDb());
 	}
-	
+
 	public function getConnection() {
 		if($this->_connection == null && $this->_extendSchema) {
-			return call_user_func(array($this->_extendSchema, 'getConnection'));	
-		} 
+			return call_user_func(array($this->_extendSchema, 'getConnection'));
+		}
 		if($this->_connection == null) {
 			return 'default';
 		}
 		return $this->_connection;
 	}
-	
+
 	public function setConnection($connection) {
 		$this->_connection = $connection;
 	}
-	
+
 	public function getDb() {
 		if(!is_string($this->_db)) {
 			if($this->_extendSchema) {
-				return $this->_extendSchema->getDb();	
+				return $this->_extendSchema->getDb();
 			}
 			throw new Epic_Mongo_Exception('No db defined');
 		}
 		return $this->_db;
 	}
-	
+
 	public function setDb($db) {
 		$this->_db = $db;
 	}
-	
+
 	public function map() {
 		// Create the typeMap if it doesn't exist
 		if(!$this->_typeMap instanceOf Epic_Mongo_Map) {
@@ -69,15 +69,15 @@ abstract class Epic_Mongo_Schema
 			if($this->_extends) {
 				$this->_typeMap = $this->_extendSchema->map();
 			} else {
-				$this->_typeMap = new Epic_Mongo_Map($this);				
+				$this->_typeMap = new Epic_Mongo_Map($this);
 			}
 			if(is_array($initial)) {
-				$this->_typeMap->addType($initial);				
+				$this->_typeMap->addType($initial);
 			}
 		}
 		return $this->_typeMap;
 	}
-	
+
 	public function resolve() {
 		$return = $this;
 		$argv = func_get_args();
@@ -87,13 +87,13 @@ abstract class Epic_Mongo_Schema
 		}
 		return $return;
 	}
-	
+
 	public function resolveString($type) {
 		$argv = func_get_args();
 		$map = $this->map();
 		$parts = explode(":", $type);
 		if(count($parts) == 1) {
-			$return = $map->getStatic($type);			
+			$return = $map->getStatic($type);
 		} else {
 			switch($parts[0]) {
 				case "doc":
