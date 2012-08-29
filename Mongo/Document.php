@@ -120,10 +120,16 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			$ops = $exportData = $this->export();
 		}
 		$db = $this->getSchema()->getMongoDb();
-		$collection = $db->selectCollection($this->getCollection());
-		$result = $collection->update(array("_id" => $this->_id), $ops, array("upsert"=>true,"safe"=>true));
-		$this->_cleanData = $exportData;
-		return $result;
+		$result = $db->command(array(
+			'findAndModify' => $this->getcollection(),
+			'query' => array("_id" => $this->_id),
+			'update' => $ops,
+			'upsert' => true,
+			'new' => true,
+		));
+		
+		$this->_cleanData = $result["value"];
+		return $result["lastErrorObject"]["ok"];
 	}
 
 	// internal function to determine if the array $data has any non-numeric keys
