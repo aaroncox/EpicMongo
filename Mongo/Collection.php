@@ -12,9 +12,13 @@ class Epic_Mongo_Collection
 	protected $_config = array();
 
 	public function __construct($config = array()) {
+		$this->setConfig($config);
+	}
+
+	public function setConfig(array $config) {
 		$class = get_called_class();
-		$this->_config = $config;
 		foreach($config as $k => $v) {
+			$this->_config[$k] = $v;
 			$method = 'set' . ucfirst($k);
 			if(method_exists($class, $method)) {
 				call_user_func(array($class, $method), $v);

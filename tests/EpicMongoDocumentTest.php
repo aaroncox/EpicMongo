@@ -23,6 +23,13 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(null, $doc->getProperty('empty'));
 	}
 
+	public function testConfig() {
+		$doc = new Epic_Mongo_Document(array(),array('test'=>true));
+		$this->assertTrue($doc->getConfig('test'));
+		$this->assertTrue(is_array($doc->getConfig()));
+		$this->assertTrue(is_null($doc->getConfig('notset')));
+	}
+
 	public function testProperties() {
 		$doc = new Epic_Mongo_Document();
 		$this->assertFalse($doc->hasProperty('key'));
@@ -166,6 +173,41 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc->createReference();
 	}
 
+	public function testSave()
+	{
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve('doc:test');
+		$doc->testSave = true;
+		$doc->save();
+
+		$test = $schema->resolve('test')->findOne(array('testSave'=>true));
+		$this->assertEquals($doc->_id, $test->_id);
+
+		$doc->testSave = null;
+		$doc->testMagic = new Epic_Mongo_Document();
+		$doc->testMagic->test = true;
+		$doc->save();
+
+		$test = $schema->resolve('test')->findOne(array('_id'=>$doc->_id));
+		$this->assertTrue($test->testMagic->test);
+		$this->assertTrue(is_null($test->testSave));
+
+		$doc->testSet = $schema->resolve('set:set');
+		$testSetDoc = $schema->resolve('doc:doc');
+		$testSetDoc->testSetDoc = true;
+		$doc->testSet->setProperty(null,$testSetDoc);
+		// should push
+		$doc->testSet[0]->save();
+
+		$test = $schema->resolve('test')->findOne(array('_id'=>$doc->_id));
+		$this->assertTrue($test->testSet[0]->testSetDoc);
+
+
+		// test save again to catch the early release line of code
+		$doc->save();
+		$doc->save();
+	}
+
 	/**
 	 * @expectedException Epic_Mongo_Exception
 	 */
@@ -173,11 +215,27 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$schema = new Test_Document_Mongo_Schema;
 		$doc = $schema->resolve('doc:doc');
 		// if you set a collection after initialization, criteria will still be empty
+		$this->assertFalse($doc->hasCollection());
+		$this->assertFalse($doc->hasKey());
+		$this->assertTrue(is_null($doc->_id));
 		$doc->setCollection('test_document');
-		$this->assertEquals(array(),$doc->getCriteria());
 		$doc->test = true;
+		$this->assertEquals(array(),$doc->getCriteria());
+		$this->assertTrue(is_null($doc->_id));
 		$doc->save();
 	}
+
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+	public function testSaveException2() {
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve('doc:test');
+		$doc->save();
+		$doc->addOperation('$notAnOp','test',true);
+		$doc->save();
+	}
+
 
 	public function testExport()
 	{
@@ -268,7 +326,7 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 	}
 } // END class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 
-class Test_Document_Requirements_Document extends Epic_Mongo_Document{
+class Test_Document_Requirements_Document extends Test_Document_Mongo_Document {
 	protected $_requirements = array(
 		'testDoc' => 'doc:Test_Document_Mongo_Document',
 		'testSet' => array('set', 'required'),
@@ -287,6 +345,7 @@ class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
 		'test' => 'Test_Document_Mongo_Document',
 		'testRequirements' => 'Test_Document_Requirements_Document',
 		'doc' => 'Epic_Mongo_Document',
+		'set:set' => 'Epic_Mongo_DocumentSet',
 	);
 	public function init() {
 		$this->_db = MongoDb_TestHarness::getInstance()->dbName;
