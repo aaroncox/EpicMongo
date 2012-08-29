@@ -62,6 +62,7 @@ class Epic_Mongo_Collection
 	 */
 	public static function isDocumentClass()
 	{
-		return is_subclass_of(get_called_class(), 'Epic_Mongo_Document');
+		$class = get_called_class();
+		return $class == 'Epic_Mongo_Document' ||  is_subclass_of(get_called_class(), 'Epic_Mongo_Document');
 	}
 } // END class Epic_Mongo_Collection

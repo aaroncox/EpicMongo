@@ -12,6 +12,11 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(class_exists('Epic_Mongo_Document'));
 	}
 
+	public function testIsDocumentClass()
+	{
+		$this->assertTrue(Epic_Mongo_Document::isDocumentClass());
+	}
+
 	public function testDefault() {
 		$doc = new Epic_Mongo_Document(array('key' => 'value'));
 		$this->assertEquals('value', $doc->getProperty('key'));
@@ -161,6 +166,18 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc->createReference();
 	}
 
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+	public function testSaveException() {
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve('doc:doc');
+		// if you set a collection after initialization, criteria will still be empty
+		$doc->setCollection('test_document');
+		$this->assertEquals(array(),$doc->getCriteria());
+		$doc->test = true;
+		$doc->save();
+	}
 
 	public function testExport()
 	{
@@ -269,6 +286,7 @@ class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_typeMap = array(
 		'test' => 'Test_Document_Mongo_Document',
 		'testRequirements' => 'Test_Document_Requirements_Document',
+		'doc' => 'Epic_Mongo_Document',
 	);
 	public function init() {
 		$this->_db = MongoDb_TestHarness::getInstance()->dbName;

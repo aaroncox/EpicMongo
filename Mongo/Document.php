@@ -16,11 +16,30 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		$this->setRequirements(array());
 		parent::__construct($config);
 		$this->_cleanData = $data;
+
+		if($this->isNewDocument() && $this->hasKey()) {
+			$this->_id = new MongoId();
+		}
+		if($this->hasId()) {
+			$criteria = array();
+			$criteria[$this->getPathToProperty('_id')] = $this->_id;
+			$this->setCriteria($criteria);
+		} 
 	}
 
 	public function isNewDocument()
 	{
 		return empty($this->_cleanData);
+	}
+
+	public function hasId()
+	{
+		return !is_null($this->_id);
+	}
+
+	public function hasKey()
+	{
+		return $this->isRootDocument() && $this->hasCollection();
 	}
 
 	public function export() {
@@ -114,20 +133,20 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 	{
 		$ops = array();
 		if ($this->isNewDocument() || $wholeDocument) {
-			if (!$this->_id) {
-				$this->_id = new MongoId();
-			}
 			$ops = $exportData = $this->export();
 		}
 		$db = $this->getSchema()->getMongoDb();
 		$result = $db->command(array(
-			'findAndModify' => $this->getcollection(),
-			'query' => array("_id" => $this->_id),
+			'findAndModify' => $this->getCollection(),
+			'query' => $this->getCriteria(),
 			'update' => $ops,
 			'upsert' => true,
 			'new' => true,
 		));
-		
+
+		if (array_key_exists('errmsg', $result)) {
+			throw new Epic_Mongo_Exception( $result['errmsg'] );
+		}
 		$this->_cleanData = $result["value"];
 		return $result["lastErrorObject"]["ok"];
 	}
@@ -153,6 +172,23 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			throw new Epic_Mongo_Exception('Can not create reference. Document is not root');
 		}
 		return MongoDBRef::create($this->getCollection(), $this->_id);
+	}
+
+	public function getCriteria()
+	{
+		if (!array_key_exists("criteria",$this->_config)) {
+			return array();
+		}
+		return $this->_config["criteria"];
+	}
+
+	public function setCriteria(array $criteria)
+	{
+		if (!array_key_exists("criteria", $this->_config)) {
+			$this->_config["criteria"] = array();
+		}
+		$this->_config["criteria"] = $criteria + $this->_config["criteria"];
+		return $this;
 	}
 
 	public function getProperty($key) {
@@ -212,11 +248,15 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			if (!$reference) {
 				$config['collection'] = $this->getCollection();
 				$config['pathToDocument'] = $this->getPathToProperty($key);
+				$config['criteria'] = $this->getCriteria();
 			}
 
 			$data = new $documentClass($data, $config);
 		}
-		return $this->_data[$key] = $data;
+		if (!is_null($data)) {
+			$this->_data[$key] = $data;
+		}
+		return $data;
 	}
 
 	public function setProperty($key, $value) {
@@ -242,7 +282,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			}
 		}
 		foreach($this->_cleanData as $key=>$value) {
-			if(in_array($key, $ignore)) {
+			if(in_array($key, $ignore) || in_array($key,$keyList)) {
 				continue;
 			}
 			if(!is_null($value)) {
