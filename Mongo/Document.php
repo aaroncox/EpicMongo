@@ -18,6 +18,11 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		$this->_cleanData = $data;
 	}
 
+	public function isNewDocument()
+	{
+		return empty($this->_cleanData);
+	}
+
 	public function export() {
 		return iterator_to_array(new Epic_Mongo_Iterator_Export($this->getIterator()));
 	}
@@ -81,6 +86,20 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		return $value;
 	}
 
+	public function getRequirements($prefix = null)
+	{
+		if ($prefix===null) {
+			return $this->_requirements;
+		}
+		$filtered = array();
+		foreach ($this->_requirements as $key=>$value) {
+			if (substr($key, 0, strlen($prefix)) == $prefix) {
+				$filtered[substr($key,strlen($prefix))] = $value;
+			}
+		}
+		return $filtered;
+	}
+
 	public function setRequirements(array $requirements)
 	{
 		// Force all property values to be an array
@@ -89,6 +108,22 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		// Merge requirement modifiers with existing requirements
 		$this->_requirements = array_merge_recursive($this->_requirements, $this->_parseRequirementsArray($requirements));
 		return $this;
+	}
+
+	public function save($wholeDocument = false)
+	{
+		$ops = array();
+		if ($this->isNewDocument() || $wholeDocument) {
+			if (!$this->_id) {
+				$this->_id = new MongoId();
+			}
+			$ops = $exportData = $this->export();
+		}
+		$db = $this->getSchema()->getMongoDb();
+		$collection = $db->selectCollection($this->getCollection());
+		$result = $collection->update(array("_id" => $this->_id), $ops, array("upsert"=>true,"safe"=>true));
+		$this->_cleanData = $exportData;
+		return $result;
 	}
 
 	// internal function to determine if the array $data has any non-numeric keys
@@ -107,6 +142,9 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 	{
 		if (!$this->hasCollection()) {
 			throw new Epic_Mongo_Exception('Can not create reference. Document does not belong to a collection');
+		}
+		if (!$this->isRootDocument()) {
+			throw new Epic_Mongo_Exception('Can not create reference. Document is not root');
 		}
 		return MongoDBRef::create($this->getCollection(), $this->_id);
 	}
@@ -138,13 +176,39 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		}
 		// if the cleanData is an array, we do special things, otherwise, we just return it.
 		if(is_array($data)) {
+			$config = array();
+			$reference = MongoDBRef::isRef($data);
+			if ($reference) {
+				$config['collection'] = $data['$ref'];
+				$data = MongoDBRef::get($this->getSchema()->getMongoDB(), $data);
+				// If this is a broken reference then no point keeping it for later
+				if (!$data) {
+					if ($required) {
+						$data = array();
+					} else {
+						$this->_data[$key] = null;
+						return $this->_data[$key];
+					}
+				}
+			}
 			if(!($doc || $set)) {
 				$set = $this->_dataIsSimpleArray($data);
 				$documentClass = $set ? "Epic_Mongo_DocumentSet" : "Epic_Mongo_Document";
 			} else {
 				$documentClass = $this->getRequirement($key, $doc?'doc':'set');
 			}
-			$data = new $documentClass($data, $this->_config);
+
+			$config['requirements'] = $this->getRequirements($key.'.');
+			if ($this->_schema) {
+				$config['schema'] = $this->_schema;
+			}
+
+			if (!$reference) {
+				$config['collection'] = $this->getCollection();
+				$config['pathToDocument'] = $this->getPathToProperty($key);
+			}
+
+			$data = new $documentClass($data, $config);
 		}
 		return $this->_data[$key] = $data;
 	}
@@ -180,6 +244,27 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			}
 		}
 		return $keyList;
+	}
+
+	public function isRootDocument()
+	{
+		return !(array_key_exists("pathToDocument",$this->_config) && $this->_config["pathToDocument"]);
+	}
+
+	public function getPathToDocument()
+	{
+		return $this->_config["pathToDocument"];
+	}
+
+	public function setPathToDocument($path="")
+	{
+		$this->_config["pathToDocument"] = $path;
+		return $this;
+	}
+
+	public function getPathToProperty($property)
+	{
+		return $this->isRootDocument() ? $property : $this->getPathToDocument() . '.' . $property;
 	}
 
 	public function __get($property) {
