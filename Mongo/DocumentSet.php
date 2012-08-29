@@ -23,6 +23,21 @@ class Epic_Mongo_DocumentSet extends Epic_Mongo_Document
 		return $config;
 	}
 
+	public function hasRequirement($key, $value) {
+		return parent::hasRequirement(Epic_Mongo_DocumentSet::DYNAMIC_INDEX, $value);
+	}
+
+	public function getRequirement($key, $requirement) {
+		return parent::getRequirement(Epic_Mongo_DocumentSet::DYNAMIC_INDEX, $requirement);
+	}
+
+	public function getRequirements($key = null) {
+		if (is_null($key)) {
+			return parent::getRequirements();
+		}
+		return parent::getRequirements('$.');
+	}
+
 	public function setProperty($key,$value) {
 		$new = is_null($key);
 		if (!$new && !is_numeric($key)) {

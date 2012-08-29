@@ -379,7 +379,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		$keyList = array();
 		$ignore = array();
 		foreach($this->_data as $key=>$value) {
-			if(is_null($value)) {
+			if(is_null($value) || ($value instanceOf Epic_Mongo_Document && $value->isEmpty())) {
 				$ignore[] = $key;
 			} else {
 				$keyList[] = $key;
@@ -394,6 +394,30 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			}
 		}
 		return $keyList;
+	}
+
+	public function isEmpty()
+	{
+		$doNoCount = array();
+
+		foreach ($this->_data as $key => $value) {
+			if ($value instanceof Epic_Mongo_Document) {
+				if (!$value->isEmpty()) {
+					return false;
+				}
+			} else if (!is_null($value)) {
+				return false;
+			}
+			$doNoCount[] = $key;
+		}
+
+		foreach ($this->_cleanData as $key => $value) {
+			if (!(in_array($key, $doNoCount) || is_null($value))) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public function isRootDocument()

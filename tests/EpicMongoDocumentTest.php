@@ -154,6 +154,23 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals("test", $doc->set[3]->test);
 	}
 
+	public function testIsEmpty()
+	{
+		$doc = new Epic_Mongo_Document();
+		$this->assertTrue($doc->isEmpty());
+		$doc->test = new Epic_Mongo_Document();
+		$this->assertTrue($doc->isEmpty());
+		$doc->test2 = true;
+		$this->assertFalse($doc->isEmpty());
+		$this->assertTrue($doc->test->isEmpty());
+		$doc->test2 = null;
+		$this->assertTrue($doc->isEmpty());
+		$doc->test->test2 = true;
+		$this->assertFalse($doc->isEmpty());
+		$this->assertFalse($doc->test->isEmpty());
+
+	}
+
 	/**
 	 * @expectedException Epic_Mongo_Exception
 	 */
@@ -206,6 +223,20 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		// test save again to catch the early release line of code
 		$doc->save();
 		$doc->save();
+	}
+
+	public function testSaveReferences() {
+		$schema = new Test_Document_Mongo_Schema;
+		$ref = $schema->resolve('doc:test');
+		$ref->testSaveReferences = true;
+		$ref->save();
+
+		$doc = $schema->resolve('doc:testRequirements');
+		$doc->testSet[] = $ref;
+		$doc->save();
+
+		$export = $doc->export();
+		$this->assertTrue(MongoDbRef::isRef($export['testSet'][0]));
 	}
 
 	/**

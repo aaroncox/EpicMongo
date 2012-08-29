@@ -39,8 +39,8 @@ class EpicMongoDocumentSetTest extends PHPUnit_Framework_TestCase
 	public function testSetPush()
 	{
 		$set = new Epic_Mongo_DocumentSet();
-		$doc = new Epic_Mongo_Document();
-		$doc2 = new Epic_Mongo_Document();
+		$doc = new Epic_Mongo_Document(array("test"=>"test"));
+		$doc2 = new Epic_Mongo_Document(array("test"=>"test"));
 		$set->setProperty(null, $doc);
 		$set->setProperty(null, $doc2);
 		$this->assertEquals($doc, $set[0]);
