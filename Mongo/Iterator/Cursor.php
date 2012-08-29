@@ -77,6 +77,10 @@ class Epic_Mongo_Iterator_Cursor implements Iterator, Countable
 	{
 		$data = $this->getInnerIterator()->current();
 
+		if(is_null($data)) {
+			return null;
+		}
+
 		$config = array();
 		$config['hasKey'] = true;
 		$config['collection'] = $this->getCollection();

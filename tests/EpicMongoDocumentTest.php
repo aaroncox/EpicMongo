@@ -270,7 +270,13 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc->addOperation('$notAnOp','test',true);
 		$doc->save();
 	}
-
+	
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+	public function testNoDataException() {
+		new Epic_Mongo_Document(null);
+	}
 
 	public function testExport()
 	{

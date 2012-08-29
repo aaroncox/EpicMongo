@@ -111,6 +111,15 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 		$iterator->rewind();
 		$this->assertEquals(99, $iterator->current()->i);
 	}
+	
+	public function testDocumentNull() {
+		$collection = $this->getNumbersCollection();
+		$cursor = $collection->find(array('test' => 'null'));
+		$iterator = new Epic_Mongo_Iterator_Cursor($cursor, array());
+		$iterator->rewind();
+		$this->assertEquals(null, $iterator->current());
+	}
+
 } // END class EpicMongoCursorTest extends PHPUnit_Framework_TestCase
 
 class Iterator_Mongo_Document_Test extends Epic_Mongo_Document {}
