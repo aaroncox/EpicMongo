@@ -10,7 +10,7 @@ class Epic_Mongo_Collection
 	protected $_collection = null;
 	protected $_schema = null;
 	protected $_config = array();
-	
+
 	public function __construct($config = array()) {
 		$class = get_called_class();
 		$this->_config = $config;
@@ -21,7 +21,7 @@ class Epic_Mongo_Collection
 			}
 		}
 	}
-	
+
 	public function setSchema(Epic_Mongo_Schema $schema) {
 		$this->_schema = $schema;
 		return $this;
@@ -33,7 +33,7 @@ class Epic_Mongo_Collection
 		}
 		return $this->_schema;
 	}
-	
+
 	public function setCollection($name) {
 		$this->_collection = $name;
 		return $this;
@@ -43,21 +43,27 @@ class Epic_Mongo_Collection
 	{
 		return !!$this->_collection;
 	}
-	
+
 	public function getCollection() {
 		return $this->_collection;
 	}
-	
+
 	public function find($query = array(), $fields = array()) {
 		$db = $this->getSchema()->getMongoDb();
 		$collection = $db->selectCollection($this->getCollection());
 		$cursor = $collection->find($query, $fields);
 		return new Epic_Mongo_Iterator_Cursor($cursor);
 	}
-	
+
+	public function findOne($query = array(), $fields = array()) {
+		$iterator = $this->find($query, $fields)->limit(1);
+		$iterator->rewind();
+		return $iterator->current();
+	}
+
 	/**
 	 * Is this class a document class
-	 * 
+	 *
 	 * @return boolean
 	 */
 	public static function isDocumentClass()
