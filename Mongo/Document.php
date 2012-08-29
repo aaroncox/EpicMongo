@@ -133,7 +133,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 	{
 		$ops = array();
 		if ($this->isNewDocument() || $wholeDocument) {
-			$ops = $exportData = $this->export();
+			$ops = $this->export();
 		}
 		$db = $this->getSchema()->getMongoDb();
 		$result = $db->command(array(
