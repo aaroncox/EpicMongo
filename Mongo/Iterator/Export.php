@@ -29,12 +29,21 @@ class Epic_Mongo_Iterator_Export implements OuterIterator
 	public function current()
 	{
 		$current = $this->getInnerIterator()->current();
+		// document we are iterating
 		$document = $this->getInnerIterator()->getDocument();
 
 		if ($current instanceof Epic_Mongo_Document) {
-			// TODO: Implement Requirements
+			if ($document instanceOf Epic_Mongo_DocumentSet) {
+				$key = Epic_Mongo_DocumentSet::DYNAMIC_INDEX;
+			} else {
+				$key = $this->key();
+			}
+			if ($document->hasRequirement($key, 'ref')) {
+				$export = $current->createReference();
+			} else {
+				$export = $current->export();
+			}
 
-			$export = $current->export();
 			if (empty($export)) {
 				return null;
 			}

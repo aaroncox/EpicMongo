@@ -38,6 +38,11 @@ class Epic_Mongo_Collection
 		$this->_collection = $name;
 		return $this;
 	}
+
+	public function hasCollection()
+	{
+		return !!$this->_collection;
+	}
 	
 	public function getCollection() {
 		return $this->_collection;
