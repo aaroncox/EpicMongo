@@ -10,8 +10,7 @@ module.exports = function(grunt) {
 	grunt.registerTask( 'test' , function () { 
 		var done = this.async();
 		grunt.utils.spawn({
-			cmd: "phpunit",
-			args: [ '--bootstrap' , 'tests/bootstrap.php' , '--coverage-html', 'tests/output', 'tests' ]
+			cmd: "phpunit"
 		}, function(err, result) { 
 			if ( err ) {
 				console.log( err.stdout , err.stderr );
