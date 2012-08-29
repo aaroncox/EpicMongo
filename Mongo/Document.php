@@ -158,7 +158,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		if($includeChildren) {
 			foreach($this as $key=>$value) {
 				if ($value instanceOf Epic_Mongo_Document && !$this->hasRequirement($key, 'ref')) {
-					array_merge($operations, $value->getOperations());
+					$operations = array_merge($operations, $value->getOperations(true));
 				}
 			}
 		}
@@ -177,17 +177,27 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		}
 	}
 
-	protected function processChanges(array $data = array())
+	protected function processChanges(array $data = array(), $cleanData = null)
 	{
+		if (is_null($cleanData)) {
+			$cleanData = $this->_cleanData;
+		}
 		foreach ($data as $key => $value) {
 			if ($key === '_id') continue;
 
-			if (!array_key_exists($key, $this->_cleanData) || $this->_cleanData[$key] !== $value) {
-				$this->addOperation('$set', $key, $value);
+			if (!array_key_exists($key, $cleanData) || $cleanData[$key] !== $value) {
+				if ($this->$key instanceOf Epic_Mongo_Document) {
+					if(!isset($cleanData[$key])) {
+						$cleanData[$key] = array();
+					}
+					$this->$key->processChanges($data[$key], $cleanData[$key]);
+				} else {
+					$this->addOperation('$set', $key, $value);
+				}
 			}
 		}
 
-		foreach ($this->_cleanData as $key => $value) {
+		foreach ($cleanData as $key => $value) {
 			if (array_key_exists($key, $data)) continue;
 
 			$this->addOperation('$unset', $key, 1);
