@@ -189,7 +189,6 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$test = array(
 			'test' => true
 		);
-		$testDoc = $schema->resolve('doc:test', $test);
 		$testRef = $schema->resolve('doc:test');
 		$testRef->test = true;
 		$testRef->save();
