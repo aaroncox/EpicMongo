@@ -209,6 +209,12 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($test->testMagic->test);
 		$this->assertTrue(is_null($test->testSave));
 
+		$doc->testMagic->test2 = true;
+		$doc->save();
+		$test = $schema->resolve('test')->findOne(array('_id'=>$doc->_id));
+		$this->assertTrue($test->testMagic->test2);
+		
+
 		$doc->testSet = $schema->resolve('set:set');
 		$testSetDoc = $schema->resolve('doc:doc');
 		$testSetDoc->testSetDoc = true;
