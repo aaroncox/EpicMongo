@@ -39,6 +39,15 @@ class Epic_Mongo_Map
 	
 	public function getClass($type) {
 		if(!isset($this->_map[$type])) {
+			if($type=='doc') {
+				return $this->_map[$type] = 'Epic_Mongo_Document';
+			}
+			if($type=='set') {
+				return $this->_map[$type] = 'Epic_Mongo_DocumentSet';
+			}
+			if($type=='cursor') {
+				return $this->_map[$type] = 'Epic_Mongo_Iterator_Cursor';
+			}
 			throw new Epic_Mongo_Exception($type . " has not be defined.");
 		}
 		return $this->_map[$type];
@@ -65,6 +74,7 @@ class Epic_Mongo_Map
 				$pass[$config] = array();
 			}
 			$pass[$config]['schema'] = $this->_schema;
+			$pass[$config]['schemaKey'] = $type;
 		}
 		return call_user_func_array(array($reflector, 'newInstance'), $pass);
 	}

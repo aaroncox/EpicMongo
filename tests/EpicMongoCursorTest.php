@@ -25,6 +25,19 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 	{
 		$this->assertTrue(class_exists('Epic_Mongo_Iterator_Cursor'));
 	}
+
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+	public function testGetSchemaException()
+	{
+		$db = $this->getHarness()->getMongoDb();
+		$collection = $db->selectCollection('iteratortest');
+		$cursor = $collection->find();
+		$iterator = new Epic_Mongo_Iterator_Cursor($cursor, array('collection' => 'iteratortest'));
+		$this->assertEquals('iteratortest',$iterator->getCollection());
+		$iterator->getSchema();
+	}
 		
 	public function testIteratorCursor() {
 		$db = $this->getHarness()->getMongoDb();
@@ -33,8 +46,8 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 		$collection->insert(array("name" => "Corey Frang"), array('safe' => true));
 		$collection->insert(array("name" => "Jacob Frye"), array('safe' => true));
 		$cursor = $collection->find();
-		$this->assertEquals(3, $cursor->count());
 		$iterator = new Epic_Mongo_Iterator_Cursor($cursor, array('collection' => 'iteratortest'));
+		$this->assertEquals(3, $cursor->count());
 		$this->assertEquals(3, $iterator->count());
 		foreach($iterator as $k => $v) {
 			$this->assertInstanceOf('Epic_Mongo_Document', $v);

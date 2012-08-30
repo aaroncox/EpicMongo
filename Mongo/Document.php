@@ -108,7 +108,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			case "set":
 				$value = $this->_requirements[$property][$requirement];
 				if (!$value) {
-					$value = $requirement === "doc" ? "Epic_Mongo_Document" : "Epic_Mongo_DocumentSet";
+					$value = false;
 				}
 				break;
 
@@ -311,27 +311,20 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		return $config;
 	}
 
-	public function getProperty($key) {
-		// if the data has already been loaded
-		if(array_key_exists($key, $this->_data)) {
-			return $this->_data[$key];
-		}
-		$data = null;
-		// read from cleanData
-		if(array_key_exists($key, $this->_cleanData)) {
-			$data = $this->_cleanData[$key];
-		}
+	protected function _resolveProperty($key, $data)
+	{
 		// array type forced
+		$auto = $this->hasRequirement($key,'auto');
+		$set = $this->hasRequirement($key,'set');
+		$doc = $this->hasRequirement($key,'doc');
+
 		if($this->hasRequirement($key,'array')) {
 			if (!$data) {
 				$data = array();
 			}
 			return $this->_data[$key] = $data;
 		}
-		$required = $this->hasRequirement($key,'required');
-		$set = $this->hasRequirement($key,'set');
-		$doc = $this->hasRequirement($key,'doc');
-		if($required && $data === null) {
+		if($auto && $data === null) {
 			if($doc || $set) {
 				$data = array();
 			}
@@ -344,27 +337,38 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 				$data = MongoDBRef::get($this->getSchema()->getMongoDB(), $data);
 				// If this is a broken reference then no point keeping it for later
 				if (!$data) {
-					if ($required) {
+					if ($auto) {
 						$data = array();
 					} else {
-						$this->_data[$key] = null;
-						return $this->_data[$key];
+						return $this->_data[$key] = null;
 					}
 				}
 			}
 			if(!($doc || $set)) {
 				$set = $this->_dataIsSimpleArray($data);
-				$documentClass = $set ? "Epic_Mongo_DocumentSet" : "Epic_Mongo_Document";
-			} else {
-				$documentClass = $this->getRequirement($key, $doc?'doc':'set');
 			}
-
-			$data = new $documentClass($data, $config);
+			$schemaType = $set ? 'set' : 'doc';
+			if($documentClass = $this->getRequirement($key, $schemaType)) {
+				$schemaType .= ":" . $documentClass;
+			}
+			$data = $this->getSchema()->resolve($schemaType, $data, $config);
 		}
 		if (!is_null($data)) {
 			$this->_data[$key] = $data;
 		}
 		return $data;
+	}
+
+	public function getProperty($key) {
+		// if the data has already been loaded
+		if(array_key_exists($key, $this->_data)) {
+			return $this->_data[$key];
+		}
+		// read from cleanData
+		if(array_key_exists($key, $this->_cleanData)) {
+			return $this->_resolveProperty($key, $this->_cleanData[$key]);
+		}
+		return $this->_resolveProperty($key, null);
 	}
 
 	public function setProperty($key, $value) {

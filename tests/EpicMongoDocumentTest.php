@@ -148,7 +148,8 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 				)
 			)
 		);
-		$doc = new Epic_Mongo_Document($data);
+		$schema = new Test_Document_Mongo_Schema();
+		$doc = $schema->resolve("doc", $data);
 		$this->assertInstanceOf("Epic_Mongo_DocumentSet", $doc->set);
 		$this->assertEquals("2", $doc->set[1]);
 		$this->assertEquals("test", $doc->set[3]->test);
@@ -215,7 +216,7 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($test->testMagic->test2);
 		
 
-		$doc->testSet = $schema->resolve('set:set');
+		$doc->testSet = $schema->resolve('set');
 		$testSetDoc = $schema->resolve('doc:doc');
 		$testSetDoc->testSetDoc = true;
 		$doc->testSet->setProperty(null,$testSetDoc);
@@ -291,7 +292,8 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 				'1', '2', '3'
 			)
 		);
-		$doc = new Epic_Mongo_Document($data);
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve("doc", $data);
 
 		$exported = $doc->export();
 		unset($data['testNull']);
@@ -333,34 +335,36 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 
 	public function testRequirements()
 	{
-		$doc = new Test_Document_Requirements_Document;
-		$this->assertFalse($doc->hasRequirement('test','required'));
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve("doc:testRequirements");
+		$this->assertFalse($doc->hasRequirement('test','auto'));
 		$this->assertTrue($doc->hasRequirement('testDoc','doc'));
-		$this->assertTrue($doc->getRequirement('testDoc','doc') === "Test_Document_Mongo_Document");
-		$this->assertFalse($doc->hasRequirement('testDoc','required'));
+		$this->assertEquals('test', $doc->getRequirement('testDoc','doc'));
+		$this->assertFalse($doc->hasRequirement('testDoc','auto'));
 		$this->assertTrue($doc->hasRequirement('testLong','long'));
 		$this->assertTrue($doc->getRequirement('testLong','long'));
 		$this->assertFalse($doc->getRequirement('testLong','doc'));
 		$this->assertTrue($doc->hasRequirement('testFloat','float'));
 		$this->assertTrue($doc->hasRequirement('testMulti','doc'));
-		$this->assertTrue($doc->hasRequirement('testMulti','required'));
+		$this->assertTrue($doc->hasRequirement('testMulti','auto'));
 		$this->assertTrue($doc->hasRequirement('testMulti','ref'));
+		$this->assertInstanceOf('Epic_Mongo_DocumentSet', $doc->testSet);
 		$this->assertTrue($doc->testSet->hasRequirement('$','doc'));
 		$this->assertTrue(is_array($doc->testArray));
 		$this->assertInstanceOf('Test_Document_Mongo_Document', $doc->testMulti);
 
-		$docExtend = new Test_Document_Requirements_Document(array(),array(
+		$docExtend = $schema->resolve('doc:testRequirements',array(),array(
 			'requirements' => array(
 				'testExtend' => 'doc'
 			)
 		));
 
 		$this->assertTrue($docExtend->hasRequirement('testSet','set'));
-		$this->assertTrue($docExtend->getRequirement('testSet','set') === "Epic_Mongo_DocumentSet");
+		$this->assertEquals("",$docExtend->getRequirement('testSet','set'));
 		$this->assertInstanceOf('Epic_Mongo_DocumentSet', $docExtend->testSet);
 		$this->assertTrue($docExtend->hasRequirement('testExtend','doc'));
 
-		$testReq = array('$' => array('doc'=>'Test_Document_Mongo_Document', 'ref'=>null));
+		$testReq = array('$' => array('doc'=>'test', 'ref'=>null));
 
 		$this->assertEquals($testReq,$docExtend->getRequirements('testSet.'));
 		$this->assertEquals($testReq,$docExtend->testSet->getRequirements());
@@ -369,14 +373,14 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 
 class Test_Document_Requirements_Document extends Test_Document_Mongo_Document {
 	protected $_requirements = array(
-		'testDoc' => 'doc:Test_Document_Mongo_Document',
-		'testSet' => array('set', 'required'),
-		'testSet.$' => array('doc:Test_Document_Mongo_Document', 'ref'),
+		'testDoc' => 'doc:test',
+		'testSet' => array('set', 'auto'),
+		'testSet.$' => array('doc:test', 'ref'),
 		'testRequired' => 'required',
 		'testArray' => 'array',
 		'testLong' => 'long',
 		'testFloat' => 'float',
-		'testMulti' => array('doc:Test_Document_Mongo_Document', 'required', 'ref'),
+		'testMulti' => array('doc:test', 'auto', 'ref'),
 		'testMulti.test' => 'required'
 	);
 }
@@ -385,8 +389,6 @@ class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
 	protected $_typeMap = array(
 		'test' => 'Test_Document_Mongo_Document',
 		'testRequirements' => 'Test_Document_Requirements_Document',
-		'doc' => 'Epic_Mongo_Document',
-		'set:set' => 'Epic_Mongo_DocumentSet',
 	);
 	public function init() {
 		$this->_db = MongoDb_TestHarness::getInstance()->dbName;

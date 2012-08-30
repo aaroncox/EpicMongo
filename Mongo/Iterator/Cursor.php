@@ -57,6 +57,14 @@ class Epic_Mongo_Iterator_Cursor implements Iterator, Countable
 		return 'Epic_Mongo_Document';
 	}
 
+	public function getSchema()
+	{
+		if(!isset($this->_config['schema'])) {
+			throw new Epic_Mongo_Exception("Requires Schema");
+		}
+		return $this->_config['schema'];
+	}
+
 	/**
 	 * Export all data
 	 *
@@ -81,14 +89,14 @@ class Epic_Mongo_Iterator_Cursor implements Iterator, Countable
 			return null;
 		}
 
-		$config = array();
+		$config = $this->_config;
 		$config['hasKey'] = true;
-		$config['collection'] = $this->getCollection();
 
+		if(isset($config['schemaKey'])) {
+			// todo check _type of data
+			return $this->getSchema()->resolve($config['schemaKey'], $data, $config);
+		}
 		$documentClass = $this->getDocumentClass();
-
-		// TODO - Check _type of data
-
 		return new $documentClass($data, $config);
 	}
 

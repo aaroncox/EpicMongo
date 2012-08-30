@@ -71,9 +71,13 @@ class EpicMongoSchemaTest extends PHPUnit_Framework_TestCase
 		$schema = new Schema_Mongo_Schema;
 		$doc = $schema->resolve("doc:user");
 		$doc2 = $schema->resolve("doc:user", array('test' => 'test'));
+		$set = $schema->resolve("set:user");
 		$this->assertInstanceOf('Schema_Mongo_User', $doc);
 		$this->assertEquals('test', $doc2->test);
 		$this->assertFalse($doc === $doc2, 'Ensure documents are different.');
+		$this->assertInstanceOf('Epic_Mongo_DocumentSet', $set);
+		$this->assertEquals("user", $set->getRequirement("$","doc"));
+
 		$static = $schema->resolve("user");
 		$this->assertFalse($static === $doc);
 		$this->assertFalse($static === $doc2);

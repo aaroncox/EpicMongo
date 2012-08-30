@@ -91,23 +91,38 @@ abstract class Epic_Mongo_Schema
 	public function resolveString($type) {
 		$argv = func_get_args();
 		$map = $this->map();
-		$parts = explode(":", $type);
-		if(count($parts) == 1) {
-			$return = $map->getStatic($type);
-		} else {
-			switch($parts[0]) {
-				case "doc":
-				case "set":
-					if(!$map->hasClass($type)) {
-						$type = $parts[1];
+		if (preg_match("/^(doc|set|cursor)(?::(.*))?$/", $type, $matches)) {
+			$docType = $matches[1];
+			$mapKey = @$matches[2];
+			$pass = $argv;
+			if ($map->hasClass($type)) {
+				$pass[0] = $type;
+			} else if ($mapKey) {
+				if ($docType=="doc") {
+					$pass[0] = $mapKey;
+				} else if ($docType == "set") {
+					while(count($pass) < 3) {
+						$pass[] = array();
 					}
-					$pass = $argv;
-					$pass[0] = $type;
-					$return = call_user_func_array(array($map, 'getInstance'), $pass);
-					break;
-				default:
-					throw new Epic_Mongo_Exception("Unknown resolve type: [" . $type . "]");
+					$pass[0] = "set";
+					if (!isset($pass[2]["requirements"])) {
+						$pass[2]["requirements"] = array();
+					}
+					if (!isset($pass[2]["requirements"]["$"])) {
+						$pass[2]["requirements"]["$"] = "doc:".$mapKey;
+					}
+				} else {
+					$pass[0] = "cursor";
+					if(!isset($pass[2]['schemaKey'])) {
+						$pass[2]["schemaKey"] = "doc:".$mapKey;
+					}
+				}
+			} else {
+				$pass[0] = $type;
 			}
+			$return = call_user_func_array(array($map, 'getInstance'), $pass);
+		} else {
+			$return = $map->getStatic($type);
 		}
 		return $return;
 	}
