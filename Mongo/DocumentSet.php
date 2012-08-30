@@ -11,14 +11,10 @@ class Epic_Mongo_DocumentSet extends Epic_Mongo_Document
 
 	protected function getConfigForProperty($key, $data) {
 		$config = parent::getConfigForProperty(Epic_Mongo_DocumentSet::DYNAMIC_INDEX, $data);
-		$config['parentIsSet'] = true;
+		$config['parentIsSet'] = $this;
 		if(array_key_exists('pathToDocument',$config)) {
 			$basePath = substr($config['pathToDocument'],0,-2);
-			if($key==Epic_Mongo_DocumentSet::DYNAMIC_INDEX){
-				$config['pathToDocument'] = $basePath;
-			} else {
-				$config['pathToDocument'] = $basePath . "." . $key;
-			}
+			$config['pathToDocument'] = $basePath . "." . $key;
 		}
 		return $config;
 	}

@@ -212,15 +212,17 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 		$new = $this->isNewDocument();
 		$root = $this->isRootDocument();
+		$set = $this->getConfig("parentIsSet");
 		if ($root && ($new || $wholeDocument)) {
 			$ops = $exportData;
 		} else {
-			if (!$root && $new && $this->getConfig("parentIsSet")) {
-				$this->addOperation('$push', null, $exportData);
+			if (!$root && $new && $set) {
+				$set->addOperation('$push', null, $exportData);
+				$ops = $set->getOperations();
 			} else {
 				$this->processChanges($exportData);
+				$ops = $this->getOperations(true);
 			}
-			$ops = $this->getOperations(true);
 			if (empty($ops)) {
 				return true;
 			}
@@ -242,6 +244,9 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 		if ($ops != $exportData) {
 			$this->purgeOperations(true);
+			if ($set) {
+				$set->purgeOperations();
+			}
 		}
 		if (array_key_exists('errmsg', $result)) {
 			throw new Epic_Mongo_Exception( $result['errmsg'] );
@@ -294,13 +299,13 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		return $this;
 	}
 
-	protected function getConfigForProperty($key, $data) {
+	protected function getConfigForProperty($key, $clean = array()) {
 		$config = array(
 			'requirements' => $this->getRequirements($key.'.')
 		);
-		if(MongoDBRef::isRef($data)) {
-			$config['collection'] = $data['$ref'];
-		} else if (!$this->hasRequirement('ref',$key)) {
+		if(isset($clean['$ref'])) {
+			$config['collection'] = $clean['$ref'];
+		} else if (!$this->hasRequirement($key,'ref')) {
 			$config['collection'] = $this->getCollection();
 			$config['pathToDocument'] = $this->getPathToProperty($key);
 			$config['criteria'] = $this->getCriteria();
@@ -311,47 +316,64 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		return $config;
 	}
 
-	protected function _resolveProperty($key, $data)
+	public function extend($data = null)
 	{
-		// array type forced
+		if (!is_null($data)) {
+			foreach($data as $key=>$value) {
+				$this->setProperty($key,$value);
+			}
+		}
+		return $this;
+	}
+
+	public function doc($key, $data = null)
+	{
+		if(array_key_exists($key,$this->_data)) {
+			return $this->_data[$key]->extend($data);
+		}
+		if (!is_array($data)) {
+			$data = array();
+		}
+		$clean = $data;
 		$auto = $this->hasRequirement($key,'auto');
 		$set = $this->hasRequirement($key,'set');
 		$doc = $this->hasRequirement($key,'doc');
+		$reference = MongoDBRef::isRef($data);
+		if ($reference) {
+			$data = MongoDBRef::get($this->getSchema()->getMongoDB(), $data);
+			// If this is a broken reference then no point keeping it for later
+			if (!$data) {
+				if ($auto) {
+					$data = array();
+				} else {
+					return $this->_data[$key] = null;
+				}
+			}
+		}
+		$config = $this->getConfigForProperty($key,$clean);
+		if(!($doc || $set)) {
+			$set = $this->_dataIsSimpleArray($data);
+		}
+		$schemaType = $set ? 'set' : 'doc';
+		if($documentClass = $this->getRequirement($key, $schemaType)) {
+			$schemaType .= ":" . $documentClass;
+		}
+		return $this->_data[$key] = $this->getSchema()->resolve($schemaType, $data, $config);
+	}
 
+	protected function _resolveProperty($key, $data)
+	{
+		$auto = $this->hasRequirement($key,'auto');
+
+		// array type forced
 		if($this->hasRequirement($key,'array')) {
 			if (!$data) {
 				$data = array();
 			}
 			return $this->_data[$key] = $data;
 		}
-		if($auto && $data === null) {
-			if($doc || $set) {
-				$data = array();
-			}
-		}
-		// if the cleanData is an array, we do special things, otherwise, we just return it.
-		if(is_array($data)) {
-			$config = $this->getConfigForProperty($key,$data);
-			$reference = MongoDBRef::isRef($data);
-			if ($reference) {
-				$data = MongoDBRef::get($this->getSchema()->getMongoDB(), $data);
-				// If this is a broken reference then no point keeping it for later
-				if (!$data) {
-					if ($auto) {
-						$data = array();
-					} else {
-						return $this->_data[$key] = null;
-					}
-				}
-			}
-			if(!($doc || $set)) {
-				$set = $this->_dataIsSimpleArray($data);
-			}
-			$schemaType = $set ? 'set' : 'doc';
-			if($documentClass = $this->getRequirement($key, $schemaType)) {
-				$schemaType .= ":" . $documentClass;
-			}
-			$data = $this->getSchema()->resolve($schemaType, $data, $config);
+		if($auto || is_array($data)) {
+			$data = $this->doc($key, $data);
 		}
 		if (!is_null($data)) {
 			$this->_data[$key] = $data;

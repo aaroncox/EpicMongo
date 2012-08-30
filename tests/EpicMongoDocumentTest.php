@@ -301,6 +301,17 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($data, $exported);
 	}
 
+	public function testDoc()
+	{
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve("doc");
+		$test = $doc->doc('test',array('test'=>true));
+		$this->assertInstanceOf("Epic_Mongo_Document", $test);
+		$this->assertTrue($test->test);
+		$this->assertSame($test, $doc->doc('test', array('heh'=>true)));
+		$this->assertTrue($test->heh);
+	}
+
 	public function testExportReferences()
 	{
 		$schema = new Test_Document_Mongo_Schema;
@@ -324,12 +335,17 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 				$testRef,
 				$brokenRef
 			),
+			'testProp' => $testRef,
 			'testMulti' => $brokenRef 
 		);
 		$doc = $schema->resolve('doc:testRequirements', $data);
+		$this->assertTrue($doc->testSet[0]->isRootDocument());
 		$this->assertEquals(null, $doc->testSet[1]);
+		$this->assertInstanceOf('Epic_Mongo_Document', $doc->testProp);
+		$this->assertTrue($doc->testProp->isRootDocument());
 		$this->assertInstanceOf('Epic_Mongo_Document', $doc->testMulti);
 		$export = $doc->export();
+		$this->assertTrue(MongoDbRef::isRef($export['testSet'][0]));
 		$this->assertEquals("test", $export["testArray"]["test"]);
 	}
 
