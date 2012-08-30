@@ -19,6 +19,10 @@ class Epic_Mongo_DocumentSet extends Epic_Mongo_Document
 		return $config;
 	}
 
+	public function doc($key = null, $data = null) {
+		return parent::doc($key, $data);
+	}
+
 	public function hasRequirement($key, $value) {
 		return parent::hasRequirement(Epic_Mongo_DocumentSet::DYNAMIC_INDEX, $value);
 	}

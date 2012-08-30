@@ -299,13 +299,11 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		return $this;
 	}
 
-	protected function getConfigForProperty($key, $clean = array()) {
+	protected function getConfigForProperty($key) {
 		$config = array(
 			'requirements' => $this->getRequirements($key.'.')
 		);
-		if(isset($clean['$ref'])) {
-			$config['collection'] = $clean['$ref'];
-		} else if (!$this->hasRequirement($key,'ref')) {
+		if(!$this->isReference($key)) {
 			$config['collection'] = $this->getCollection();
 			$config['pathToDocument'] = $this->getPathToProperty($key);
 			$config['criteria'] = $this->getCriteria();
@@ -320,10 +318,36 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 	{
 		if (!is_null($data)) {
 			foreach($data as $key=>$value) {
-				$this->setProperty($key,$value);
+				if(!array_key_exists($key,$this->_data)) {
+					if(is_array($value)) {
+						$this->_resolveProperty($key,$value);
+					} else {
+						$this->setProperty($key,$value);
+					}
+				} else if ($this->_data[$key] instanceOf Epic_Mongo_Document) {
+					$this->_data[$key]->extend($value);
+				} else {
+					$this->setProperty($key,$value);
+				}
 			}
 		}
 		return $this;
+	}
+
+	public function isReference( $key ) {
+		if(array_key_exists($key, $this->_data)) {
+			$data = $this->_data[$key];
+			if ($data instanceOf Epic_Mongo_Document && $data->getConfig('isReference')) {
+				return "data";
+			}
+		}
+		if(array_key_exists($key, $this->_cleanData) && MongoDbRef::isRef($this->_cleanData[$key])) {
+			return "clean";
+		} 
+		if($this->hasRequirement($key,'ref')) {
+			return "requirement";
+		}
+		return false;
 	}
 
 	public function doc($key, $data = null)
@@ -334,23 +358,23 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		if (!is_array($data)) {
 			$data = array();
 		}
-		$clean = $data;
-		$auto = $this->hasRequirement($key,'auto');
 		$set = $this->hasRequirement($key,'set');
 		$doc = $this->hasRequirement($key,'doc');
-		$reference = MongoDBRef::isRef($data);
-		if ($reference) {
+		$ref = MongoDbRef::isRef($data);
+		$config = array();
+		if ($ref) {
+			$config['collection'] = $data['$ref'];
+			$config['isReference'] = true;
 			$data = MongoDBRef::get($this->getSchema()->getMongoDB(), $data);
 			// If this is a broken reference then no point keeping it for later
 			if (!$data) {
-				if ($auto) {
+				if($this->hasRequirement($key,'auto')) {
 					$data = array();
 				} else {
 					return $this->_data[$key] = null;
 				}
 			}
 		}
-		$config = $this->getConfigForProperty($key,$clean);
 		if(!($doc || $set)) {
 			$set = $this->_dataIsSimpleArray($data);
 		}
@@ -358,7 +382,9 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		if($documentClass = $this->getRequirement($key, $schemaType)) {
 			$schemaType .= ":" . $documentClass;
 		}
-		return $this->_data[$key] = $this->getSchema()->resolve($schemaType, $data, $config);
+		$doc = $this->getSchema()->resolve($schemaType, $data, $config);
+		$this->setProperty($key,$doc);
+		return $doc;
 	}
 
 	protected function _resolveProperty($key, $data)

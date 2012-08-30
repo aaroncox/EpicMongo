@@ -45,6 +45,13 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 		$collection->getSchema();
 	}
 
+	public function testGetConfig()
+	{
+		$this->assertEquals(null,Epic_Mongo::testCollection('test')->getConfig("testing"));
+		$this->assertEquals(Epic_Mongo::testCollection('test')->getSchema(),Epic_Mongo::testCollection('test')->getConfig("schema"));
+		
+	}
+
 	public function testFind() {
 		$cursor = Epic_Mongo::testCollection('test')->find();
 		$this->assertInstanceOf('Epic_Mongo_Iterator_Cursor', $cursor);

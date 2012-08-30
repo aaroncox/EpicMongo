@@ -26,6 +26,14 @@ class Epic_Mongo_Collection
 		}
 	}
 
+	public function getConfig($key)
+	{
+		if(array_key_exists($key,$this->_config)) {
+			return $this->_config[$key];
+		}
+		return null;
+	}
+
 	public function setSchema(Epic_Mongo_Schema $schema) {
 		$this->_schema = $schema;
 		return $this;

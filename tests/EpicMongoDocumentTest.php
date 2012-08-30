@@ -109,6 +109,44 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 
 	}
 
+	public function testExtend()
+	{
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve('doc');
+		$doc->extend(array(
+			'test' => true,
+			'testArray' => array(
+				array(
+					'test' => true
+				),
+				array(
+					'test' => true
+				)
+			)
+		));
+		$this->assertTrue($doc->test);
+		$this->assertTrue($doc->testArray[0]->test);
+		$this->assertTrue($doc->testArray[1]->test);
+		$doc->extend(array(
+			'test' => false,
+			'testArray' => array(
+				null,
+				array(
+					'test' => false
+				),
+				array(
+					'test' => true
+				)
+			),
+			'omg' => 'testing',
+		));
+		$this->assertFalse($doc->test);
+		$this->assertTrue($doc->testArray[0]->test);
+		$this->assertFalse($doc->testArray[1]->test);
+		$this->assertTrue($doc->testArray[2]->test);
+		
+	}
+
 	public function testRecursiveIterator() {
 		$data = array(
 			'k1' => new Epic_Mongo_Document(array('test' => 'value')),
@@ -341,12 +379,22 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc = $schema->resolve('doc:testRequirements', $data);
 		$this->assertTrue($doc->testSet[0]->isRootDocument());
 		$this->assertEquals(null, $doc->testSet[1]);
+		$this->assertEquals("clean", $doc->isReference('testProp'));
 		$this->assertInstanceOf('Epic_Mongo_Document', $doc->testProp);
 		$this->assertTrue($doc->testProp->isRootDocument());
+		$this->assertEquals("data", $doc->isReference('testProp'));
 		$this->assertInstanceOf('Epic_Mongo_Document', $doc->testMulti);
 		$export = $doc->export();
 		$this->assertTrue(MongoDbRef::isRef($export['testSet'][0]));
 		$this->assertEquals("test", $export["testArray"]["test"]);
+	}
+
+	public function testIsReference()
+	{
+		$schema = new Test_Document_Mongo_Schema;
+		$doc = $schema->resolve('doc:testRequirements');
+		$this->assertInstanceOf('Test_Document_Mongo_Document', $doc->doc('testMulti'));
+		$this->assertEquals("requirement", $doc->isReference('testMulti'));
 	}
 
 	public function testRequirements()
