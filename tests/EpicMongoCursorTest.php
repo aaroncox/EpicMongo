@@ -38,6 +38,17 @@ class EpicMongoIteratorCursorTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals('iteratortest',$iterator->getCollection());
 		$iterator->getSchema();
 	}
+
+	public function testGetCollection()
+	{
+		$db = $this->getHarness()->getMongoDb();
+		$collection = $db->selectCollection('iteratortest');
+		$cursor = $collection->find();
+		$iterator = new Epic_Mongo_Iterator_Cursor($cursor, array('collection' => 'iteratortest'));
+		$this->assertEquals('iteratortest',$iterator->getCollection());
+		$iterator = new Epic_Mongo_Iterator_Cursor($cursor, array());
+		$this->assertEquals(null, $iterator->getCollection());
+	}
 		
 	public function testIteratorCursor() {
 		$db = $this->getHarness()->getMongoDb();
