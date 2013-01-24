@@ -1,4 +1,4 @@
-Epic-Mongo
+EpicMongo
 ==========
 
 MongoDb ORM for PHP (Inspired by [Shanty Mongo](https://github.com/coen-hyde/Shanty-Mongo), but rebuilt without Zend Framework)
