@@ -299,7 +299,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		return $this;
 	}
 
-	protected function getConfigForProperty($key) {
+	protected function getConfigForProperty($key, $data) {
 		$config = array(
 			'requirements' => $this->getRequirements($key.'.')
 		);
