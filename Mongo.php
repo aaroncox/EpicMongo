@@ -10,7 +10,6 @@ require_once($baseDir . "/Mongo/Iterator/Document.php");
 require_once($baseDir . "/Mongo/Iterator/Export.php");
 require_once($baseDir . "/Mongo/Map.php");
 require_once($baseDir . "/Mongo/Schema.php");
-require_once($baseDir . "/Mongo/Schema/Laravel.php");
 /**
 *	Epic_Mongo 
 */
