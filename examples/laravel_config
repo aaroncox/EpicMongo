@@ -1,0 +1,17 @@
+<?php
+
+return array(
+	// Server to Connect to
+	'host' => '127.0.0.1',
+	// Username & Password (NYI on connection)
+	'username' => null,
+	'password' => null,
+	// Database Name to use 
+	'dbname' => 'laravel',
+	// Where are the models stored? Default is application/models (string 'models')
+	'models' => 'models',
+	// The TypeMap for the Default Schema
+	'typemap' => array(
+		'test' => 'Test',
+	)
+);
