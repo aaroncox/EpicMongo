@@ -256,7 +256,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		} else {
 			$this->_cleanData = $exportData;
 		}
-		return $result["lastErrorObject"]["ok"];
+		return $result["ok"];
 	}
 
 	// internal function to determine if the array $data has any non-numeric keys
