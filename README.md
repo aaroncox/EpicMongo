@@ -48,7 +48,7 @@ Easily create a new document that is properly typed.
 ```php
 <?php 
 // Create a Sample User 
-$user = Epic_Mongo::new('user');	// The 'shortname' from the schema
+$user = Epic_Mongo::doc('new:user');	// Adding 'new:' and then the 'shortname' from the schema
 $user->id = 1;
 $user->username = 'admin';
 $user->password = 'password';
@@ -94,7 +94,7 @@ class LIB_Mongo_Schema extends Epic_Mongo_Schema {
 }
 
 // Create a User 
-$user = Epic_Mongo::new('user');	// The 'shortname' from the schema
+$user = Epic_Mongo::doc('new:user');	// The 'shortname' from the schema
 // Some random example data
 $user->id = 2;
 $user->username = 'author';
@@ -103,7 +103,7 @@ $user->password = 'password';
 $user->save();
 
 // Create a Post document for the User
-$post = Epic_Mongo::new('post');
+$post = Epic_Mongo::doc('new:post');
 
 // Set the User as the author of the post, no need to create a reference
 $post->author = $user;
@@ -203,7 +203,7 @@ $values = array(
 	'email' => 'email@email.com',
 );
 // Pass the Array into the ->setFromArray function
-$user = Epic_Mongo::new('user')->setFromArray($values)->save();
+$user = Epic_Mongo::doc('new:user')->setFromArray($values)->save();
 echo $user->username; // returns 'admin'
 echo $user->password; // returns 'password'
 echo $user->email; // returns 'email@email.com'
