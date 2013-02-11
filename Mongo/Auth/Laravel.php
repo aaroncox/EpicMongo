@@ -35,19 +35,15 @@ class Epic_Mongo_Auth_Laravel extends \Laravel\Auth\Drivers\Driver {
 		}
 		$model = Config::get('auth.model');
 		$query = array(
-			Config::get('auth.username') => $arguments['username']
+			Config::get('auth.username') => $arguments[Config::get('auth.username')]
 		);
-
 		$user = Epic_Mongo::db('user')->findOne($query);
-		// var_dump($user); exit;
-
 		// This driver uses a basic username and password authentication scheme
 		// so if the credentials match what is in the database we will just
 		// log the user into the application and remember them if asked.
-		$password = $arguments['password'];
-		
+		$password = $arguments[Config::get('auth.password')];
 		// if ( ! is_null($user) and Hash::check($password, $user->password))
-		if ( ! is_null($user) and md5($password) === $user->password)
+		if ( ! is_null($user) and Hash::check($password, $user->password))
 		{
 			return $this->login($user->_id, array_get($arguments, 'remember'));
 		}
