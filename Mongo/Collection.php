@@ -21,7 +21,7 @@ class Epic_Mongo_Collection
 			$this->_config[$k] = $v;
 			$method = 'set' . ucfirst($k);
 			if(method_exists($class, $method)) {
-				call_user_func(array($class, $method), $v);
+				call_user_func(array($this, $method), $v);
 			}
 		}
 	}
