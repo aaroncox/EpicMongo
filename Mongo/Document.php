@@ -14,7 +14,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 	public function __construct($data = array(), $config = array()) {
 		// guaruntees that the requirements get parsed
-		$this->setRequirements(array());
+		$this->setRequirements($this->_typeMap?:array());
 		parent::__construct($config);
 		if(!is_array($data)) {
 			throw new Epic_Mongo_Exception("Data must be an array.");
