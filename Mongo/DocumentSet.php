@@ -40,9 +40,9 @@ class Epic_Mongo_DocumentSet extends Epic_Mongo_Document
 
 	public function setProperty($key,$value) {
 		$new = is_null($key);
-		if (!$new && !is_numeric($key)) {
-			throw new Epic_Mongo_Exception('DocumentSets must only contain numeric keys');
-		}
+		// if (!$new && !is_numeric($key)) {
+		// 	throw new Epic_Mongo_Exception('DocumentSets must only contain numeric keys');
+		// }
 		if(!(is_null($value) || $value instanceOf Epic_Mongo_Document)) {
 			throw new Epic_Mongo_Exception('DocumentSets must only contain documents');
 		}
