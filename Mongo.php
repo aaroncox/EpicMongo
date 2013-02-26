@@ -3,6 +3,8 @@ $baseDir = dirname(__FILE__);
 require_once($baseDir . "/Mongo/Collection.php");
 require_once($baseDir . "/Mongo/Connection.php");
 require_once($baseDir . "/Mongo/Document.php");
+require_once($baseDir . "/Mongo/Document/Sequence.php");
+require_once($baseDir . "/Mongo/Document/Sequenced.php");
 require_once($baseDir . "/Mongo/DocumentSet.php");
 require_once($baseDir . "/Mongo/Exception.php");
 require_once($baseDir . "/Mongo/Iterator/Cursor.php");
