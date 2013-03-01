@@ -7,6 +7,27 @@
  **/
 class EpicMongoEmbedTest extends PHPUnit_Framework_TestCase
 {
+	public function testEmbedDocReplacement() {
+		$schema = new Test_Embed_Schema;
+		$base = $schema->resolve('doc:base');
+		$base->id = "embed-test-2";
+		$fakeset1 = $schema->resolve('doc:fakeset');
+		$fakeset1->test = "rawr";
+		$base->embedded = $fakeset1;
+		$base->save();
+
+		// Load the same document from the DB
+		$base2 = $schema->resolve('base')->findOne(array("id" => "embed-test-2"));
+		$fakeset2 = $schema->resolve('doc:fakeset');
+		$fakeset2->test = "rawr again!";
+		$base2->embedded = $fakeset2;
+		$base2->save();
+		
+		// Load the same document again
+		$base3 = $schema->resolve('base')->findOne(array("id" => "embed-test-2"));
+		$this->assertEquals($base2->embedded->test, $base3->embedded->test);
+	}
+	
 	public function testEmbedReplacement() {
 		// Create a new Schema
 		$schema = new Test_Embed_Schema;
