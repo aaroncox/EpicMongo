@@ -64,7 +64,7 @@ class EpicMongoDocumentSetTest extends PHPUnit_Framework_TestCase
 
 class Test_DocumentSet_DocumentSet extends Epic_Mongo_DocumentSet {
 	protected $_requirements = array(
-		'$' => 'doc:test'
+		'$' => array('doc:test')
 	);
 }
 
