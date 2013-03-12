@@ -4,7 +4,7 @@ class Epic_Mongo_Document_Sequenced extends Epic_Mongo_Document {
 
 	protected $_sequenceCollection = 'epic_sequences';
 
-	public function save() {
+	public function save($wholeDocument = false) {
 		if($this->_sequenceKey) {
 			if(!$this->id) {
 				$this->id = $this->getNextSequence($this->_sequenceKey);
@@ -12,7 +12,7 @@ class Epic_Mongo_Document_Sequenced extends Epic_Mongo_Document {
 		} else {
 			throw new Exception("In order to extend Epic_Mongo_Document_Sequenced, your Document Class needs a protected _sequenceKey value specifying the key the sequence will be stored as.");
 		}
-		return parent::save();
+		return parent::save($wholeDocument);
 	}
 	  
   public function getNextSequence($sequenceId) {
