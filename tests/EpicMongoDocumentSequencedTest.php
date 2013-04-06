@@ -1,5 +1,5 @@
 <?php
-
+// Test Sequenced Documents, the Collection and Incremenenting
 class EpicMongoDocumentSequencedTest extends PHPUnit_Framework_TestCase {
 	public function testEpicMongoDocumentExists()
 	{
