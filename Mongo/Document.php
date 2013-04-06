@@ -188,7 +188,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		foreach ($data as $key => $value) {
 			$cleanExists = array_key_exists($key, $cleanData);
 			if ((!$cleanExists || $cleanData[$key] !== $value) &&
-				($key != '_id' || !$this->isRootDocument())) {
+				!($key == '_id' && $this->isRootDocument())) {
 				if ($cleanExists && $this->$key instanceOf Epic_Mongo_Document) {
 					$this->$key->processChanges($data[$key], $cleanData[$key]);
 				} else {
