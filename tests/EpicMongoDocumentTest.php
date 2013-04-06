@@ -289,15 +289,17 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		// Create Embedded Document #1
 		$embed1 = $schema->resolve('doc:testEmbedded');
 		$embed1->value = 1;
+		$embed1->save();
 		// Create Embedded Document #2
 		$embed2 = $schema->resolve('doc:testEmbedded');
 		$embed2->value = 2;
+		$embed2->save();
 		// Save the 1st embedded document and save
 		$doc->test = $embed1;
-		$doc->save(true);
+		$doc->save();
 		// Save the 2nd embedded document and save
 		$doc->test = $embed2;
-		$doc->save(true);
+		$doc->save();
 		// Attempt to load the Document from the collection to see what's saved on it
 		$loaded = $schema->resolve('testEmbed')->findOne(array('_id' => $doc->_id));
 		$this->assertEquals($loaded->test->_id, $doc->test->_id);
@@ -476,8 +478,6 @@ class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
 		'testRequirements' => 'Test_Document_Requirements_Document',
 		'testEmbed' => 'Test_Document_Mongo_Document_Embed',
 		'testEmbedded' => 'Test_Document_Mongo_Document_Embedded',
-		'testRefEmbed' => 'Test_Document_Mongo_Document_RefEmbed',
-		'testRefEmbedded' => 'Test_Document_Mongo_Document_RefEmbedded',
 	);
 	public function init() {
 		$this->_db = MongoDb_TestHarness::getInstance()->dbName;
@@ -495,14 +495,5 @@ class Test_Document_Mongo_Document_Embed extends Epic_Mongo_Document {
 	);
 }
 class Test_Document_Mongo_Document_Embedded extends Epic_Mongo_Document {
-	protected $_collection = 'test_document';
-}
-class Test_Document_Mongo_Document_RefEmbed extends Epic_Mongo_Document {
-	protected $_collection = 'test_document';
-	protected $_requirements = array(
-		'test' => array('doc:testEmbedded', 'ref')
-	);
-}
-class Test_Document_Mongo_Document_RefEmbedded extends Epic_Mongo_Document {
 	protected $_collection = 'test_document';
 }
