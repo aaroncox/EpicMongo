@@ -10,7 +10,7 @@ class Epic_Mongo_Document_Sequenced extends Epic_Mongo_Document {
 				$this->id = $this->getNextSequence($this->_sequenceKey);
 			}
 		} else {
-			throw new Exception("In order to extend Epic_Mongo_Document_Sequenced, your Document Class needs a protected _sequenceKey value specifying the key the sequence will be stored as.");
+			throw new Epic_Mongo_Exception("In order to extend Epic_Mongo_Document_Sequenced, your Document Class needs a protected _sequenceKey value specifying the key the sequence will be stored as.");
 		}
 		return parent::save($wholeDocument);
 	}
@@ -23,12 +23,8 @@ class Epic_Mongo_Document_Sequenced extends Epic_Mongo_Document {
   		'new' => TRUE,
   		'upsert' => TRUE
   	);
-		// var_dump($update); exit;
   	$result = $this->getSchema()->getMongoDb()->command($update);
-  	if($result['ok'] == true) {
-  	  return $result['value']['sequence'];				
-  	}
-  	return false;
+ 	  return $result['value']['sequence'];				
   }
 
 	public function setNextSequence($sequenceId, $value) {
@@ -40,9 +36,6 @@ class Epic_Mongo_Document_Sequenced extends Epic_Mongo_Document {
   		'upsert' => TRUE
   	);
   	$result = $this->getSchema()->getMongoDb()->command($update);
-  	if($result['ok'] == true) {
-  	  return $result['value']['sequence'];				
-  	}
-  	return false;
+ 	  return $result['value']['sequence'];				
 	}
 }
