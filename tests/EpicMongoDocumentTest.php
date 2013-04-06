@@ -300,6 +300,7 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc->save();
 		// Attempt to load the Document from the collection to see what's saved on it
 		$loaded = $schema->resolve('testEmbed')->findOne(array('_id' => $doc->_id));
+		$this->assertEquals($loaded->test->_id, $doc->test->_id);
 		$this->assertEquals($loaded->test->value, $doc->test->value);
 		$this->assertEquals($loaded->test->value, 2);
 	}

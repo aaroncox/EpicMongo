@@ -187,7 +187,8 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		}
 		foreach ($data as $key => $value) {
 			$cleanExists = array_key_exists($key, $cleanData);
-			if ($key != '_id' && (!$cleanExists || $cleanData[$key] !== $value)) {
+			if ((!$cleanExists || $cleanData[$key] !== $value) &&
+				($key != '_id' || !$this->isRootDocument())) {
 				if ($cleanExists && $this->$key instanceOf Epic_Mongo_Document) {
 					$this->$key->processChanges($data[$key], $cleanData[$key]);
 				} else {
@@ -234,13 +235,14 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		}
 
 		$db = $this->getSchema()->getMongoDb();
-		$result = $db->command(array(
+		$q = array(
 			'findAndModify' => $this->getCollection(),
 			'query' => $criteria,
 			'update' => $ops,
 			'upsert' => true,
 			'new' => true,
-		));
+		);
+		$result = $db->command($q);
 
 		if ($ops != $exportData) {
 			$this->purgeOperations(true);
