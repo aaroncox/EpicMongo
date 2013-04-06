@@ -339,6 +339,38 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 	public function testNoDataException() {
 		new Epic_Mongo_Document(null);
 	}
+	
+	public function testDeleteDocument() {
+		$schema = new Test_Document_Mongo_Schema;
+		// Create and Save
+		$doc = $schema->resolve('doc:test');
+		$doc->save();
+		// Delete it
+		$doc->delete();
+	}
+	
+	public function testDeleteEmbeddedDocument() {
+		$schema = new Test_Document_Mongo_Schema;
+		// Create and Save
+		$doc = $schema->resolve('doc:test');
+		// Create the Embedded
+		$doc->embed = $schema->resolve('doc:test');
+		$doc->save();
+		// Delete it
+		$doc->embed->delete();
+	}
+
+	/**
+	 * @expectedException Epic_Mongo_Exception
+	 */
+	public function testDeleteNoCollectionDocument() {
+		$schema = new Test_Document_Mongo_Schema;
+		// Create and Save
+		$doc = $schema->resolve('doc:testNoCollection');
+		// Delete it
+		$doc->delete();
+	}
+	
 
 	public function testExport()
 	{
@@ -478,6 +510,7 @@ class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
 		'testRequirements' => 'Test_Document_Requirements_Document',
 		'testEmbed' => 'Test_Document_Mongo_Document_Embed',
 		'testEmbedded' => 'Test_Document_Mongo_Document_Embedded',
+		'testNoCollection' => 'Test_Document_Mongo_Document_NoCollection',
 	);
 	public function init() {
 		$this->_db = MongoDb_TestHarness::getInstance()->dbName;
@@ -496,4 +529,6 @@ class Test_Document_Mongo_Document_Embed extends Epic_Mongo_Document {
 }
 class Test_Document_Mongo_Document_Embedded extends Epic_Mongo_Document {
 	protected $_collection = 'test_document';
+}
+class Test_Document_Mongo_Document_NoCollection extends Epic_Mongo_Document {
 }
