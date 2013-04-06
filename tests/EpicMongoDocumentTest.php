@@ -289,11 +289,9 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		// Create Embedded Document #1
 		$embed1 = $schema->resolve('doc:testEmbedded');
 		$embed1->value = 1;
-		$embed1->save();
 		// Create Embedded Document #2
 		$embed2 = $schema->resolve('doc:testEmbedded');
 		$embed2->value = 2;
-		$embed2->save();
 		// Save the 1st embedded document and save
 		$doc->test = $embed1;
 		$doc->save();
@@ -302,7 +300,8 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 		$doc->save();
 		// Attempt to load the Document from the collection to see what's saved on it
 		$loaded = $schema->resolve('testEmbed')->findOne(array('_id' => $doc->_id));
-		$this->assertEquals($loaded->test->_id, $doc->test->_id);
+		$this->assertEquals($loaded->test->value, $doc->test->value);
+		$this->assertEquals($loaded->test->value, 2);
 	}
 
 	/**
