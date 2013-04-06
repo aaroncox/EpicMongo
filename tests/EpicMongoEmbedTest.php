@@ -76,7 +76,7 @@ class EpicMongoEmbedTest extends PHPUnit_Framework_TestCase
 		// Place the new fake set ontop of the old one
 		$base->embedded = $fakeset;
 		// Save
-		$base->save();
+		$base->save(true);
 		// Load the document we just saved twice into a new variable.
 		$loaded = $schema->resolve("base")->findOne(array("id" => "embed-test"));
 		// Foreach of it's embedded documents
