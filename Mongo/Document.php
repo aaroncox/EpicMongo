@@ -14,7 +14,7 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 
 	public function __construct($data = array(), $config = array()) {
 		// guaruntees that the requirements get parsed
-		$this->setRequirements(array());
+		$this->setRequirements($this->_typeMap?:array());
 		parent::__construct($config);
 		if(!is_array($data)) {
 			throw new Epic_Mongo_Exception("Data must be an array.");
@@ -257,6 +257,37 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 			$this->_cleanData = $exportData;
 		}
 		return $result["ok"];
+	}
+	
+	/**
+	 * Delete this document
+	 * 
+	 * $return boolean Result of delete
+	 */
+	public function delete()
+	{
+		// Make sure it's in a collection
+		if (!$this->hasCollection()) {
+			throw new Epic_Mongo_Exception('Can not delete document, it does not belong to a collection.');
+		}
+		
+		// Get the name of it's collection
+		$name = $this->getCollection();
+		
+		// Get the collection itself
+		$collection = $this->getSchema()->getMongoDB()->$name;
+		
+		// Is this a root document or an embedded document?
+		if (!$this->isRootDocument()) {
+			// If embedded, unset the document on the root document
+			$result = $collection->update($this->getCriteria(), array('$unset' => array($this->getPathToDocument() => 1)));
+		} else {
+			// Else just remove it by the query
+			$result = $collection->remove($this->getCriteria(), array('justOne' => true));
+		}
+		
+		// Return the Results
+		return $result;
 	}
 
 	// internal function to determine if the array $data has any non-numeric keys
