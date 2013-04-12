@@ -46,13 +46,6 @@ class Epic_Mongo_Map
 				return $this->_map[$type] = 'Epic_Mongo_DocumentSet';
 			}
 			if($type=='cursor') {
-				// If the Document has a public $cursor defined, use it.
-				foreach(array_keys($this->_map) as $key) {
-					if(isset($this->_static[$key]) && $this->_static[$key]->cursor) {
-						return $this->_map[$type] = $this->_static[$key]->cursor;
-					}
-				}
-				// Otherwise use the Epic_Mongo_Iterator_Cursor
 				return $this->_map[$type] = 'Epic_Mongo_Iterator_Cursor';
 			}
 			throw new Epic_Mongo_Exception($type . " has not be defined.");
