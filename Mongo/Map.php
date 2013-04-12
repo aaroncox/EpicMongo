@@ -48,7 +48,7 @@ class Epic_Mongo_Map
 			if($type=='cursor') {
 				// If the Document has a public $cursor defined, use it.
 				foreach(array_keys($this->_map) as $key) {
-					if(isset($this->_static[$key]) && isset($this->_static[$key]->cursor)) {
+					if(isset($this->_static[$key]) && $this->_static[$key]->cursor) {
 						return $this->_map[$type] = $this->_static[$key]->cursor;
 					}
 				}
