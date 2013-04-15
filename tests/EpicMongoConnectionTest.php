@@ -17,7 +17,7 @@ class EpicMongoConnectionTest extends PHPUnit_Framework_TestCase
 		$connection = Epic_Mongo::getConnection();
 		$info = $connection->getConnectionInfo();
 		$this->assertEquals(TEST_CONNECTION_STRING, $info['connectionString']);
-		$this->assertInstanceOf('Mongo', $connection);
+		$this->assertInstanceOf('MongoClient', $connection);
 	}
 
 	public function testDefaultConnection() {
