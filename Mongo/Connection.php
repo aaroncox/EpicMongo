@@ -5,7 +5,7 @@
  * @package default
  * @author Aaron Cox
  **/
-class Epic_Mongo_Connection extends Mongo
+class Epic_Mongo_Connection extends MongoClient
 {
 	protected $_connectionInfo = array();
 	
