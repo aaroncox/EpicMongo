@@ -1,0 +1,30 @@
+{
+	"name": "aaroncox/epicmongo",
+	"type": "library",
+	"description": "MongoDB ORM",
+	"keywords": ["mongodb","orm"],
+	"homepage": "http://github.com/aaroncox/EpicMongo",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Aaron Cox",
+			"email": "aaron.cox@greymass.com",
+			"homepage": "http://greymass.com",
+			"role": "Developer"
+		},
+		{
+			"name": "Corey Frang",
+			"email": "gnarf@gnarf.net",
+			"homepage": "http://gnarf.net",
+			"role": "Developer"
+		}
+	],
+	"require": {
+		"php": ">=5.3.0"
+	},
+	"autoload": {
+		"files": [
+			"Mongo.php"
+		]
+	}
+}
