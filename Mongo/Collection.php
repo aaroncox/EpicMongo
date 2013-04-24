@@ -67,14 +67,23 @@ class Epic_Mongo_Collection
 		$config = array(
 			"schema" => $this->getSchema(),
 			"collection" => $this->getCollection(),
+			"schemaKey" => "doc:".$this->_config['schemaKey'],
 		);
 		return $this->getSchema()->resolve("cursor:".$this->_config['schemaKey'], $cursor, $config);
 	}
 
 	public function findOne($query = array(), $fields = array()) {
-		$iterator = $this->find($query, $fields)->limit(1);
-		$iterator->rewind();
-		return $iterator->current();
+		$db = $this->getSchema()->getMongoDb();
+		$collection = $db->selectCollection($this->getCollection());
+		$document = $collection->findOne($query, $fields);
+		if(!$document) {
+			return null;
+		}
+		$config = array(
+			"schema" => $this->getSchema(),
+			"collection" => $this->getCollection(),
+		);
+		return $this->getSchema()->resolve("doc:".$this->_config['schemaKey'], $document, $config);
 	}
 
 	/**
