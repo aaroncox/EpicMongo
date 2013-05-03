@@ -165,7 +165,7 @@ class EpicMongoDocumentTest extends PHPUnit_Framework_TestCase
 	{
 		$schema = new Test_Document_Mongo_Schema();
 		$cursor = $schema->resolve('test')->find();
-		$this->assertInstanceOf("Epic_Mongo_Iterator_Cursor", $cursor);
+		$this->assertInstanceOf("Test_Document_Mongo_Iterator_Cursor", $cursor);
 	}
 
 	/**
@@ -511,6 +511,7 @@ class Test_Document_Mongo_Schema extends Epic_Mongo_Schema {
 		'testEmbed' => 'Test_Document_Mongo_Document_Embed',
 		'testEmbedded' => 'Test_Document_Mongo_Document_Embedded',
 		'testNoCollection' => 'Test_Document_Mongo_Document_NoCollection',
+		'cursor:test' => 'Test_Document_Mongo_Iterator_Cursor',
 	);
 	public function init() {
 		$this->_db = MongoDb_TestHarness::getInstance()->dbName;
@@ -531,4 +532,7 @@ class Test_Document_Mongo_Document_Embedded extends Epic_Mongo_Document {
 	protected $_collection = 'test_document';
 }
 class Test_Document_Mongo_Document_NoCollection extends Epic_Mongo_Document {
+}
+
+class Test_Document_Mongo_Iterator_Cursor extends Epic_Mongo_Iterator_Cursor {
 }
