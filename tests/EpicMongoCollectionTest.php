@@ -55,8 +55,9 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 	public function testFind() {
 		$cursor = Epic_Mongo::testCollection('test')->find();
 		$this->assertInstanceOf('Epic_Mongo_Iterator_Cursor', $cursor);
+		$this->assertInstanceOf('Collection_Mongo_Schema', $cursor->getSchema());
 	}
-	
+
 	public function testFindOne() {
 		$doc = Epic_Mongo::testCollection('test')->findOne();
 		$this->assertInstanceOf('Epic_Mongo_Collection', $doc);
@@ -70,6 +71,15 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 		// Assert that the "OK" status is 0 (failed), because the pipeline is empty
 		$this->assertEquals(0, $doc['ok']);
 	}
+
+	public function testFindOneNull() {
+		$query = array(
+			'keyThatDoesntExist' => true
+		);
+		$doc = Epic_Mongo::testCollection('test')->findOne($query);
+		$this->assertNull($doc);		
+	}
+
 } // END class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 
 
