@@ -96,4 +96,13 @@ class Epic_Mongo_Collection
 		$class = get_called_class();
 		return $class == 'Epic_Mongo_Document' ||  is_subclass_of(get_called_class(), 'Epic_Mongo_Document');
 	}
+	
+	/**
+	 * Access to the aggregation framework
+	 */
+	public function aggregate(array $pipeline) {
+		$db = $this->getSchema()->getMongoDb();
+		$collection = $db->selectCollection($this->getCollection());
+		return $collection->aggregate($pipeline);
+	}
 } // END class Epic_Mongo_Collection
