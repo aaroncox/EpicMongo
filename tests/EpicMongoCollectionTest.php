@@ -56,6 +56,20 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 		$cursor = Epic_Mongo::testCollection('test')->find();
 		$this->assertInstanceOf('Epic_Mongo_Iterator_Cursor', $cursor);
 	}
+	
+	public function testFindOne() {
+		$doc = Epic_Mongo::testCollection('test')->findOne();
+		$this->assertInstanceOf('Epic_Mongo_Collection', $doc);
+	}
+	
+	public function testAggregate() {
+		$pipeline = array();
+		$doc = Epic_Mongo::testCollection('test')->aggregate($pipeline);
+		// Assert that the results came back as an array
+		$this->assertTrue(is_array($doc));
+		// Assert that the "OK" status is 0 (failed), because the pipeline is empty
+		$this->assertEquals(0, $doc['ok']);
+	}
 } // END class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 
 
