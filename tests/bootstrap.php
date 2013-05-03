@@ -26,7 +26,7 @@ class MongoDb_TestHarness {
 	private function __construct() {
 		$this->dbName = 'test-' . md5(time() . rand());
 		$x = 1;
-		while($x < 10000) {
+		while($x <= 10000) {
 			$doc = array(
 				'_id' => $x,
 				'v1' => $x % 10,
