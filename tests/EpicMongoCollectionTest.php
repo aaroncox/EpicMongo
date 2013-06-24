@@ -58,11 +58,6 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Collection_Mongo_Schema', $cursor->getSchema());
 	}
 
-	public function testFindOne() {
-		$doc = Epic_Mongo::testCollection('test')->findOne();
-		$this->assertInstanceOf('Epic_Mongo_Collection', $doc);
-	}
-
 	public function testFindOneNull() {
 		$query = array(
 			'keyThatDoesntExist' => true
