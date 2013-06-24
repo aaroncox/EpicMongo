@@ -295,6 +295,9 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 	// internal function to determine if the array $data has any non-numeric keys
 	protected function _dataIsSimpleArray(array $data)
 	{
+		if(empty($data)) {
+			return false;
+		}
 		$keys = array_keys($data);
 		foreach($keys as $k){
 			if (is_string($k)) {
