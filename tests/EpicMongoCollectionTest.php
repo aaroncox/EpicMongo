@@ -57,6 +57,15 @@ class EpicMongoCollectionTest extends PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Epic_Mongo_Iterator_Cursor', $cursor);
 		$this->assertInstanceOf('Collection_Mongo_Schema', $cursor->getSchema());
 	}
+	
+	public function testAggregate() {
+		$pipeline = array();
+		$doc = Epic_Mongo::testCollection('test')->aggregate($pipeline);
+		// Assert that the results came back as an array
+		$this->assertTrue(is_array($doc));
+		// Assert that the "OK" status is 0 (failed), because the pipeline is empty
+		$this->assertEquals(0, $doc['ok']);
+	}
 
 	public function testFindOneNull() {
 		$query = array(

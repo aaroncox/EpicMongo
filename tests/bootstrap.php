@@ -25,6 +25,17 @@ class MongoDb_TestHarness {
 	public $dbName;
 	private function __construct() {
 		$this->dbName = 'test-' . md5(time() . rand());
+		$x = 1;
+		while($x <= 10000) {
+			$doc = array(
+				'_id' => $x,
+				'v1' => $x % 10,
+				'v2' => $x * 10,
+				'v3' => $x * 100,
+			);
+			$this->getMongoDb()->test->insert($doc);
+			$x++;
+		}
 	}
 	public function __destruct() {
 		$this->getMongoDb()->command(array("dropDatabase" => 1));
