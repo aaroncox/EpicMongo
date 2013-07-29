@@ -18,7 +18,12 @@ class Epic_Mongo_Auth_Laravel extends \Laravel\Auth\Drivers\Driver {
 		$query = array(
 			'_id' => new MongoId($id)
 		);
-		return Epic_Mongo::db('user')->findOne($query);
+		$user = Epic_Mongo::db('user')->findOne($query);
+		// If we have a the "seen" method, run it
+		if(method_exists($user,'seen')) {
+			$user->seen();			
+		}
+		return $user;
 	}
 
 	/**
