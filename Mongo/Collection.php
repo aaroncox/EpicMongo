@@ -66,6 +66,12 @@ class Epic_Mongo_Collection
 		return $collection->update($query, $update, array("w" => 1));
 	}
 
+	public function upsert($query = array(), $update = array()) {
+		$db = $this->getSchema()->getMongoDb();
+		$collection = $db->selectCollection($this->getCollection());
+		return $collection->update($query, $update, array("w" => 1, 'upsert' => true));
+	}
+
 	public function find($query = array(), $fields = array()) {
 		$db = $this->getSchema()->getMongoDb();
 		$collection = $db->selectCollection($this->getCollection());
