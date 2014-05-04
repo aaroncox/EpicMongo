@@ -22,7 +22,11 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		$this->_cleanData = $data;
 
 		if($this->isNewDocument() && $this->hasKey()) {
-			$this->_id = new MongoId();
+			if(isset($data['_id'])) {
+				$this->_id = new MongoId($data['_id']);
+			} else {
+				$this->_id = new MongoId();
+			}
 		}
 		if($this->hasId()) {
 			$criteria = array();
