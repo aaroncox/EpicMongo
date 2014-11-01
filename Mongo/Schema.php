@@ -120,7 +120,17 @@ abstract class Epic_Mongo_Schema
 			} else {
 				$pass[0] = $type;
 			}
-			$return = call_user_func_array(array($map, 'getInstance'), $pass);
+			if(strpos($pass[0], ",")) {
+				$parts = explode(",", $pass[0]);
+				foreach($parts as $part) {
+					if(strstr($pass[2]['collection'], $part)) {
+						$pass[0] = $part;
+						$return = call_user_func_array(array($map, 'getInstance'), $pass);
+					}
+				}
+			} else {
+				$return = call_user_func_array(array($map, 'getInstance'), $pass);
+			}
 		} else {
 			$return = $map->getStatic($type);
 		}
