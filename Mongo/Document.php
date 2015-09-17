@@ -165,11 +165,11 @@ class Epic_Mongo_Document extends Epic_Mongo_Collection implements ArrayAccess, 
 		if($includeChildren) {
 			foreach($this as $key=>$value) {
 				if ($value instanceOf Epic_Mongo_Document && !$this->hasRequirement($key, 'ref')) {
-					$operations = array_merge($operations, $value->getOperations(true));
+					$operations = array_merge_recursive($operations, $value->getOperations(true));
 				}
 			}
 		}
-		return array_merge($operations,$this->_operations);
+		return array_merge_recursive($operations, $this->_operations);
 	}
 
 	public function purgeOperations($includeChildren = false)
