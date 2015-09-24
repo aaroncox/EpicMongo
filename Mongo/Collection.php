@@ -98,6 +98,12 @@ class Epic_Mongo_Collection
 		return $this->getSchema()->resolve("doc:".$this->_config['schemaKey'], $document, $config);
 	}
 
+	public function distinct($field, $query = array()) {
+		$db = $this->getSchema()->getMongoDb();
+		$collection = $db->selectCollection($this->getCollection());
+		return $collection->distinct($field, $query);
+	}
+
 	/**
 	 * Is this class a document class
 	 *
